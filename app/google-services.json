@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "344106859444",
+    "project_id": "bolo-magic",
+    "storage_bucket": "bolo-magic.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:344106859444:android:89195326475852826f50e1",
+        "android_client_info": {
+          "package_name": "bolomagic.in"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "344106859444-u4kbagvroms4cq9qm8f79duesjjv6r4f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC8Qs_T7ReYIQqzlFzwGRE17SgWFcrQOCw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "344106859444-u4kbagvroms4cq9qm8f79duesjjv6r4f.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

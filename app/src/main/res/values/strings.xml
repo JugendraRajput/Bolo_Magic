@@ -1,0 +1,30 @@
+<resources>
+    <string name="app_name">Bolo Magic</string>
+    <string name="checking_account_updates">Checking account Updates…</string>
+    <string name="todo">TODO</string>
+    <string name="login_with_google">Login with Google</string>
+    <string name="home">Home</string>
+    <string name="profile">Profile</string>
+    <string name="loading">---</string>
+    <string name="title_activity_lifafa">Lifafa Zon</string>
+    <string name="action_addmoney">Add Money</string>
+    <string name="action_create">Create New Lifafa</string>
+    <string name="action_received">Already Received</string>
+    <string name="action_created">Creation History</string>
+    <string name="action_giftcardhistory">History</string>
+    <string name="action_cart">My Cart</string>
+    <string name="quiz_loading">Quiz Loading...</string>
+    <string name="quiz_loading_message">Please wait, While we are loading quiz for you.</string>
+    <string name="reload">Reload</string>
+    <string name="vs">Vs</string>
+    <string name="quiz_over">Quiz Over</string>
+    <string name="play_again">Play Again</string>
+    <string name="exit">Exit</string>
+    <string name="your_score">Your Score</string>
+    <string name="please_enter_the_correct_player_id">Please enter the correct player id</string>
+    <string name="our_team_and_server_will_identify_you_by_this_id_you_can_save_player_id_once_in_the_one_event">Our team and server will identify you by this id. You can save player id once in the one event.</string>
+    <string name="player_id">Player ID</string>
+    <string name="enter_player_id">Enter Player ID</string>
+    <string name="save_id">Save ID</string>
+    <item name="item_click_support" type="id" />
+</resources>
