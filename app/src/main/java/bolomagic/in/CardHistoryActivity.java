@@ -3,9 +3,11 @@ package bolomagic.in;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -40,6 +42,15 @@ public class CardHistoryActivity extends AppCompatActivity {
             UID = mAuth.getCurrentUser().getUid();
             listView = findViewById(R.id.listView);
             Picasso.get().load(loadingImageURL).into((ImageView) findViewById(R.id.imageView16));
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                    view.animate().rotationX(90).setDuration(400).alpha(0).withEndAction(() ->{
+                        view.animate().rotationX(0).setDuration(400).alpha(1).start();
+                    });
+                }
+            });
             LoadHistory();
         }else {
             finish();
@@ -66,7 +77,11 @@ public class CardHistoryActivity extends AppCompatActivity {
                         }
                         String status = next.child("Status").getValue().toString();
                         String date = next.child("Time").getValue().toString();
-                        cardHistoryParseArrayList.add(new CardHistoryParse(imageURL,String.valueOf(prize),status,date));
+                        String code = "Default";
+                        if (next.hasChild("Code")){
+                            code = next.child("Code").getValue().toString();
+                        }
+                        cardHistoryParseArrayList.add(new CardHistoryParse(imageURL,String.valueOf(prize),status,date,code));
                     }
                     CardHistoryAdapter cardHistoryAdapter = new CardHistoryAdapter(CardHistoryActivity.this, cardHistoryParseArrayList);
                     listView.setAdapter(cardHistoryAdapter);

@@ -1,5 +1,6 @@
 package bolomagic.in;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
@@ -13,21 +14,34 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+
 public class PlayQuizActivity extends AppCompatActivity {
 
-    String quizType;
+    String quizID;
 
+    ConstraintLayout loading_Layout, quiz_Layout, end_Layout;
     //Loading Layout Items
     ConstraintLayout custom_Profiles_Layout;
     ImageView loadingImageView;
     TextView titleTextView, messageTextView;
     Button reloadButton;
+    String quizStatus = "Default";
+
+    ArrayList<String> questionsID = new ArrayList<>();
+    ArrayList<QuizQuestions> quizQuestionsArrayList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play_quiz);
-        quizType = getIntent().getStringExtra("Quiz Type");
+        quizID = getIntent().getStringExtra("quizID");
 
         custom_Profiles_Layout = findViewById(R.id.custom_Profiles_Layout);
         loadingImageView = findViewById(R.id.imageView1);
@@ -35,19 +49,19 @@ public class PlayQuizActivity extends AppCompatActivity {
         messageTextView = findViewById(R.id.textView2);
         reloadButton = findViewById(R.id.button1);
 
-        if (quizType.equals("1v1")){
-            custom_Profiles_Layout.setVisibility(View.VISIBLE);
-        }
+        loading_Layout = findViewById(R.id.loading_Layout);
+        quiz_Layout = findViewById(R.id.quiz_Layout);
+        end_Layout = findViewById(R.id.end_Layout);
 
         reloadButton.setOnClickListener(v -> {
             if (isConnectionAvailable(PlayQuizActivity.this)){
-                loadingImageView.setBackgroundResource(R.drawable.loading);
+                loadingImageView.setImageResource(R.drawable.loading);
                 titleTextView.setText("Connecting...");
                 messageTextView.setText("We are trying to connect with our server.");
                 reloadButton.setVisibility(View.GONE);
                 init();
             }else {
-                loadingImageView.setBackgroundResource(R.drawable.pending_img);
+                loadingImageView.setImageResource(R.drawable.pending_img);
                 titleTextView.setText("Connection not found");
                 messageTextView.setText("It looks like that you are not connected to a active internet connection " +
                         "OR you have disabled internet usage permission for "+R.string.app_name);
@@ -58,25 +72,63 @@ public class PlayQuizActivity extends AppCompatActivity {
         if (isConnectionAvailable(this)){
             init();
         }else {
-            loadingImageView.setBackgroundResource(R.drawable.pending_img);
+            loadingImageView.setImageResource(R.drawable.pending_img);
             titleTextView.setText("Connection not found");
             messageTextView.setText("It looks like that you are not connected to a active internet connection " +
                     "OR you have disabled internet usage permission for "+R.string.app_name);
             reloadButton.setVisibility(View.VISIBLE);
-
-            /*
-            new AlertDialog.Builder(PlayQuizActivity.this)
-                    .setIcon(android.R.drawable.ic_lock_idle_alarm)
-                    .setTitle("!! Notice !!")
-                    .setMessage("Network Issue")
-                    .setNegativeButton("Exit", (dialogInterface, i) -> finish())
-                    .show();
-             */
         }
     }
 
     private void init(){
-        Toast.makeText(this, "Connected for "+quizType, Toast.LENGTH_SHORT).show();
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+        databaseReference = databaseReference.child("SPL").child("Quiz").child(quizID);
+        DatabaseReference finalDatabaseReference = databaseReference;
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                quizStatus = snapshot.child("Status").getValue().toString();
+                loadingImageView.setImageResource(R.drawable.verified_img);
+                titleTextView.setText("Connection Successful");
+                messageTextView.setText("You are connected with server.");
+                if (snapshot.hasChild("Message")){
+                    messageTextView.setText(snapshot.child("Message").getValue().toString());
+                }
+
+                if (snapshot.hasChild("Questions")){
+                    loading_Layout.setVisibility(View.GONE);
+                    quiz_Layout.setVisibility(View.VISIBLE);
+                    Iterable<DataSnapshot> dataSnapshotIterable = snapshot.child("Questions").getChildren();
+                    for (DataSnapshot next : dataSnapshotIterable){
+                        String questionID = next.getKey();
+                        if (!questionsID.contains(questionID)){
+                            String question = next.child("Question").getValue().toString();
+                            String optionA = next.child("Option A").getValue().toString();
+                            String optionB = next.child("Option B").getValue().toString();
+                            String optionC = next.child("Option C").getValue().toString();
+                            String optionD = next.child("Option D").getValue().toString();
+                            quizQuestionsArrayList.add(new QuizQuestions(questionID,question,optionA,optionB,optionC,optionD,"Default"));
+                            questionsID.add(questionID);
+                        }
+                    }
+                }
+                if (quizStatus.equals("Ended")){
+                    loading_Layout.setVisibility(View.GONE);
+                    quiz_Layout.setVisibility(View.GONE);
+                    TextView textView76 = findViewById(R.id.textView76);
+                    int myScore = 20;
+                    textView76.setText(myScore + " points");
+                    end_Layout.setVisibility(View.VISIBLE);
+                    finalDatabaseReference.keepSynced(false);
+                    findViewById(R.id.button17).setOnClickListener(v -> finish());
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(PlayQuizActivity.this, error.toString(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     public static boolean isConnectionAvailable(Context context) {

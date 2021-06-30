@@ -37,7 +37,7 @@ public class QuizListAdaptor extends ArrayAdapter<QuizListParse> {
         textView1.setText(quizListParse.getQuizName());
 
         TextView textView2 = view.findViewById(R.id.textView2);
-        textView2.setText("₹ "+quizListParse.getEntryFee());
+        textView2.setText("₹ "+quizListParse.getPrizePool());
 
         TextView textView3 = view.findViewById(R.id.textView3);
         String startTime = quizListParse.getQuizStartTime();
@@ -72,6 +72,7 @@ public class QuizListAdaptor extends ArrayAdapter<QuizListParse> {
                 Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
             });
         }else {
+            button1.setText("₹ "+quizListParse.getEntryFee());
             button1.setOnClickListener(v -> {
                 String message = "Joining...";
                 Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();

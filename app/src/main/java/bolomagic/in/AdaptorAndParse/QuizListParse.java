@@ -4,25 +4,29 @@ public class QuizListParse {
     public String quizID;
     public String quizType;
     public String quizName;
-    public String entryFee;
+    public String prizePool;
     public String quizStartTime;
     public String quizEndTime;
     public String totalJoined;
     public String maxJoined;
     public String isJoined;
+    public String entryFee;
     public String minimumJoin;
+    public String status;
 
-    public QuizListParse(String quizID, String quizType, String quizName, String entryFee, String quizStartTime, String quizEndTime, String totalJoined, String maxJoined, String isJoined, String minimumJoin) {
+    public QuizListParse(String quizID, String quizType, String quizName, String prizePool, String quizStartTime, String quizEndTime, String totalJoined, String maxJoined, String isJoined, String entryFee, String minimumJoin, String status) {
         this.quizID = quizID;
         this.quizType = quizType;
         this.quizName = quizName;
-        this.entryFee = entryFee;
+        this.prizePool = prizePool;
         this.quizStartTime = quizStartTime;
         this.quizEndTime = quizEndTime;
         this.totalJoined = totalJoined;
         this.maxJoined = maxJoined;
         this.isJoined = isJoined;
+        this.entryFee = entryFee;
         this.minimumJoin = minimumJoin;
+        this.status = status;
     }
 
     public String getQuizID() {
@@ -37,8 +41,8 @@ public class QuizListParse {
         return quizName;
     }
 
-    public String getEntryFee() {
-        return entryFee;
+    public String getPrizePool() {
+        return prizePool;
     }
 
     public String getQuizStartTime() {
@@ -61,8 +65,16 @@ public class QuizListParse {
         return isJoined;
     }
 
+    public String getEntryFee() {
+        return entryFee;
+    }
+
     public String getMinimumJoin() {
         return minimumJoin;
+    }
+
+    public String getStatus() {
+        return status;
     }
 
     public void setTotalJoined(String totalJoined) {

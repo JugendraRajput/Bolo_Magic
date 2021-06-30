@@ -46,6 +46,7 @@ import bolomagic.in.AdaptorAndParse.HomeListParse;
 import bolomagic.in.AdaptorAndParse.QuizListAdaptor;
 import bolomagic.in.AdaptorAndParse.QuizListParse;
 import bolomagic.in.CustomDialog.CustomDialogHome;
+import bolomagic.in.CustomDialog.CustomDialogJoin;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -79,6 +80,8 @@ public class MainActivity extends AppCompatActivity {
 
     BottomNavigationView bottomNavigationView;
     TabLayout tabLayout;
+
+    public static int currentQuizPosition = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -152,7 +155,15 @@ public class MainActivity extends AppCompatActivity {
                 customDialogHome.getWindow().setAttributes(layoutParams);
                 customDialogHome.show();
             }else {
-                Toast.makeText(this, quizListParseArrayList.get(position).getQuizName(), Toast.LENGTH_SHORT).show();
+                currentQuizPosition = position;
+                CustomDialogJoin customDialogJoin = new CustomDialogJoin(this);
+                customDialogJoin.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+                layoutParams.copyFrom(customDialogJoin.getWindow().getAttributes());
+                layoutParams.gravity = Gravity.BOTTOM;
+                customDialogJoin.getWindow().setAttributes(layoutParams);
+                customDialogJoin.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+                customDialogJoin.show();
             }
         });
 
@@ -196,24 +207,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
 
-                String isJoined = "false";
-                for (int i = 1; i<11; i++){
-                    if (i == 7){
-                        isJoined = "true";
-                    }
-                    if (i == 8){
-                        isJoined = "false";
-                    }
-                    if (i == 9){
-                        isJoined = "true";
-                    }
-
-                    quizListParseArrayList.add(new QuizListParse(String.valueOf(i),"Default","First "+i+"v"+i,"20","05:00 PM","06:00 PM","5","10",isJoined,"3"));
-                }
-                quizListAdaptor = new QuizListAdaptor(MainActivity.this, quizListParseArrayList);
                 homeListAdapter = new HomeListAdapter(MainActivity.this, homeListParseArrayList);
-
-                listView.setAdapter(quizListAdaptor);
 
                 tabLayout.setVisibility(View.VISIBLE);
                 if (homeListParseArrayList.size() < 1){
@@ -233,6 +227,52 @@ public class MainActivity extends AppCompatActivity {
                         handler.postDelayed(this, 5000);
                     }
                 }, 5000);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(MainActivity.this, error.toString(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        DatabaseReference quizDatabaseReference = FirebaseDatabase.getInstance().getReference().child("SPL").child("Quiz");
+        quizDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.hasChildren()){
+                    Iterable<DataSnapshot> dataSnapshotIterable = snapshot.getChildren();
+                    for (DataSnapshot next : dataSnapshotIterable){
+                        String quizID = next.getKey();
+                        String backgroundURL = "Default";
+                        if (next.hasChild("Background URL")){
+                            backgroundURL = next.child("Background URL").getValue().toString();
+                        }
+
+                        String isJoined = "false";
+                        String totalJoined = "0";
+                        if (next.hasChild("Joined Users")){
+                            if (next.child("Joined Users").hasChild(UID)){
+                                isJoined = "true";
+                            }
+                            totalJoined = String.valueOf(next.child("Joined Users").getChildrenCount());
+                        }
+
+                        String quizName = next.child("Quiz Name").getValue().toString();
+                        String prizePool = next.child("Prize Pool").getValue().toString();
+                        String startTime = next.child("Start Time").getValue().toString();
+                        String endTime = next.child("End Time").getValue().toString();
+
+                        String maxJoined = next.child("Max Joined").getValue().toString();
+                        String entryFee = next.child("Entry").getValue().toString();
+                        String minimumJoined = next.child("minimum Joined").getValue().toString();
+                        String status = next.child("Status").getValue().toString();
+                        quizListParseArrayList.add(new QuizListParse(quizID,backgroundURL,quizName,prizePool,startTime,endTime,totalJoined,maxJoined,isJoined,entryFee,minimumJoined,status));
+                    }
+                    quizListAdaptor = new QuizListAdaptor(MainActivity.this, quizListParseArrayList);
+                    listView.setAdapter(quizListAdaptor);
+                }else {
+                    Toast.makeText(MainActivity.this, "No active quiz !", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
@@ -358,6 +398,7 @@ public class MainActivity extends AppCompatActivity {
                 bottomNavigationView.setSelectedItemId(R.id.nav_home);
             });
         }else {
+            quizListParseArrayList.clear();
             super.onBackPressed();
         }
     }

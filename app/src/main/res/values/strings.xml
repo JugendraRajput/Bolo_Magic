@@ -13,13 +13,13 @@
     <string name="action_created">Creation History</string>
     <string name="action_giftcardhistory">History</string>
     <string name="action_cart">My Cart</string>
-    <string name="quiz_loading">Quiz Loading...</string>
+    <string name="quiz_loading">Quiz Loading…</string>
     <string name="quiz_loading_message">Please wait, While we are loading quiz for you.</string>
     <string name="reload">Reload</string>
     <string name="vs">Vs</string>
-    <string name="quiz_over">Quiz Over</string>
+    <string name="quiz_over">Quiz Ended</string>
     <string name="play_again">Play Again</string>
-    <string name="exit">Exit</string>
+    <string name="exit">Finish</string>
     <string name="your_score">Your Score</string>
     <string name="please_enter_the_correct_player_id">Please enter the correct player id</string>
     <string name="our_team_and_server_will_identify_you_by_this_id_you_can_save_player_id_once_in_the_one_event">Our team and server will identify you by this id. You can save player id once in the one event.</string>

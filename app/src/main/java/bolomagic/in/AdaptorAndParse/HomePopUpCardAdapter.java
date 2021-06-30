@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import bolomagic.in.HashMap.CreateEventCardOrder;
+import bolomagic.in.MainActivity;
 import bolomagic.in.PlayerID;
 import bolomagic.in.R;
 
@@ -125,17 +126,21 @@ public class HomePopUpCardAdapter extends RecyclerView.Adapter<HomePopUpCardAdap
                         .setPositiveButton("Confirm", (dialog, which) -> {
                             holder.buy_button.setEnabled(true);
                             boolean isValidBalance = false;
+                            String walletAmountType = "Default";
                             try{
                                 if (Integer.parseInt(DepositAmount) >= currentPrize*currentCartCount){
                                     isValidBalance = true;
                                 }
+                                walletAmountType = "Integer";
                             }catch (Exception e){
                                 if (Double.parseDouble(DepositAmount) >= Double.parseDouble(String.valueOf(currentPrize*currentCartCount))){
                                     isValidBalance = true;
                                 }
+                                walletAmountType = "Double";
                             }
                             if (isValidBalance){
                                 DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("SPL").child("Users").child(UID);
+                                String finalWalletAmountType = walletAmountType;
                                 databaseReference.child("Event Player IDs").child(eventID).addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -152,16 +157,28 @@ public class HomePopUpCardAdapter extends RecyclerView.Adapter<HomePopUpCardAdap
                                             Map<String, Object> childUpdates = new HashMap<>();
                                             childUpdates.put(orderID, orderValues);
                                             databaseReference.child("Event Order History").updateChildren(childUpdates);
-                                            databaseReference.child("Personal Information").child("Wallets").child("Deposit Amount").setValue(currentPrize*currentCartCount - Integer.parseInt(DepositAmount));
+                                            if (!finalWalletAmountType.equals("Default")){
+                                                if (finalWalletAmountType.equals("Double")){
+                                                    final double parseDouble = Double.parseDouble(String.valueOf(currentPrize * currentCartCount));
+                                                    databaseReference.child("Personal Information").child("Wallets").child("Deposit Amount").setValue(Double.parseDouble(DepositAmount) - parseDouble);
+                                                    databaseReference.child("Personal Information").child("Wallets").child("Wallet History").child(orderID).child("Name").setValue("Event Card brought.\nCard Name: "+cardName);
+                                                    databaseReference.child("Personal Information").child("Wallets").child("Wallet History").child(orderID).child("Amount").setValue(Double.parseDouble(DepositAmount) - parseDouble);
+                                                    databaseReference.child("Personal Information").child("Wallets").child("Wallet History").child(orderID).child("Time").setValue(ServerValue.TIMESTAMP);}
+                                                if (finalWalletAmountType.equals("Integer")){
+                                                    databaseReference.child("Personal Information").child("Wallets").child("Deposit Amount").setValue(Integer.parseInt(DepositAmount) - currentPrize*currentCartCount);
+                                                    databaseReference.child("Personal Information").child("Wallets").child("Wallet History").child(orderID).child("Name").setValue("Event Card brought.\nCard Name: "+cardName);
+                                                    databaseReference.child("Personal Information").child("Wallets").child("Wallet History").child(orderID).child("Amount").setValue(Integer.parseInt(DepositAmount) - currentPrize*currentCartCount);
+                                                    databaseReference.child("Personal Information").child("Wallets").child("Wallet History").child(orderID).child("Time").setValue(ServerValue.TIMESTAMP);
+                                                }
+                                                DatabaseReference databaseReferenceAdmin = FirebaseDatabase.getInstance().getReference().child("Admin");
+                                                databaseReferenceAdmin.child("Event Order History").updateChildren(childUpdates);
+                                                databaseReferenceAdmin.child("Event Order History").child(orderID).child("UID").setValue(UID);
+                                                databaseReferenceAdmin.child("Event Order History").child(orderID).child("Player ID").setValue(currentEventPlayerID);
+                                            }else {
+                                                holder.buy_button.setEnabled(true);
+                                                Toast.makeText(homeListAdapter.getContext(), "Something went wrong.", Toast.LENGTH_SHORT).show();
+                                            }
 
-                                            databaseReference.child("Personal Information").child("Wallets").child("Wallet History").child(orderID).child("Name").setValue("Event Card brought.\nCard Name: "+cardName);
-                                            databaseReference.child("Personal Information").child("Wallets").child("Wallet History").child(orderID).child("Amount").setValue(currentPrize*currentCartCount);
-                                            databaseReference.child("Personal Information").child("Wallets").child("Wallet History").child(orderID).child("Time").setValue(ServerValue.TIMESTAMP);
-
-                                            DatabaseReference databaseReferenceAdmin = FirebaseDatabase.getInstance().getReference().child("Admin");
-                                            databaseReferenceAdmin.child("Event Order History").updateChildren(childUpdates);
-                                            databaseReferenceAdmin.child("Event Order History").child(orderID).child("UID").setValue(UID);
-                                            databaseReferenceAdmin.child("Event Order History").child(orderID).child("Player ID").setValue(currentEventPlayerID);
                                             /////////
                                         }else {
                                             Toast.makeText(homeListAdapter.getContext(), "Please enter Player id", Toast.LENGTH_SHORT).show();
