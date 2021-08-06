@@ -5,7 +5,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -26,20 +29,21 @@ public class LifafaReceivedHistoryAdapter extends ArrayAdapter<LifafaReceivedHis
 
         LifafaReceivedHistoryParse lifafaReceivedHistoryParse = getItem(position);
 
-        TextView textView1 = (TextView) listItemView.findViewById(R.id.textView302);
-        textView1.setText(lifafaReceivedHistoryParse.getID());
+        ImageView imageView = listItemView.findViewById(R.id.imageView);
+        Picasso.get().load(lifafaReceivedHistoryParse.getSenderProfilePic()).into(imageView);
 
-        TextView textView2 = (TextView) listItemView.findViewById(R.id.textView307);
-        textView2.setText(lifafaReceivedHistoryParse.getReceiverName());
+        TextView textView1 = listItemView.findViewById(R.id.textView1);
+        textView1.setText(lifafaReceivedHistoryParse.getSenderName());
 
-        TextView textView3 = (TextView) listItemView.findViewById(R.id.textView309);
-        textView3.setText(lifafaReceivedHistoryParse.getReceivedTime());
+        TextView textView2 = listItemView.findViewById(R.id.textView2);
+        String message = lifafaReceivedHistoryParse.getMessage();
+        if (message.length() > 29){
+            message = message.substring(0,29)+"...";
+        }
+        textView2.setText(message);
 
-        TextView textView4 = (TextView) listItemView.findViewById(R.id.textView400);
-        textView4.setText(lifafaReceivedHistoryParse.getWon());
-
-        TextView textView5 = (TextView) listItemView.findViewById(R.id.textView404);
-        textView5.setText(lifafaReceivedHistoryParse.getStatus());
+        TextView textView3 = listItemView.findViewById(R.id.textView3);
+        textView3.setText(lifafaReceivedHistoryParse.getDate());
 
         return listItemView;
     }

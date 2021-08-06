@@ -34,8 +34,24 @@ public class PlayQuizActivity extends AppCompatActivity {
     Button reloadButton;
     String quizStatus = "Default";
 
+    ArrayList<String> answeredQuestions = new ArrayList<>();
     ArrayList<String> questionsID = new ArrayList<>();
     ArrayList<QuizQuestions> quizQuestionsArrayList = new ArrayList<>();
+
+    TextView questionTextView;
+    Button buttonA, buttonB, buttonC, buttonD;
+    String currentAnswer = "Default";
+
+    public static boolean isConnectionAvailable(Context context) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager != null) {
+            NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+            return networkInfo != null && networkInfo.isConnected()
+                    && networkInfo.isConnectedOrConnecting()
+                    && networkInfo.isAvailable();
+        }
+        return false;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +68,12 @@ public class PlayQuizActivity extends AppCompatActivity {
         loading_Layout = findViewById(R.id.loading_Layout);
         quiz_Layout = findViewById(R.id.quiz_Layout);
         end_Layout = findViewById(R.id.end_Layout);
+
+        questionTextView = findViewById(R.id.questionTextView);
+        buttonA = findViewById(R.id.button11);
+        buttonB = findViewById(R.id.button12);
+        buttonC = findViewById(R.id.button13);
+        buttonD = findViewById(R.id.button14);
 
         reloadButton.setOnClickListener(v -> {
             if (isConnectionAvailable(PlayQuizActivity.this)){
@@ -103,11 +125,12 @@ public class PlayQuizActivity extends AppCompatActivity {
                         String questionID = next.getKey();
                         if (!questionsID.contains(questionID)){
                             String question = next.child("Question").getValue().toString();
+                            String answer = next.child("Answer").getValue().toString();
                             String optionA = next.child("Option A").getValue().toString();
                             String optionB = next.child("Option B").getValue().toString();
                             String optionC = next.child("Option C").getValue().toString();
                             String optionD = next.child("Option D").getValue().toString();
-                            quizQuestionsArrayList.add(new QuizQuestions(questionID,question,optionA,optionB,optionC,optionD,"Default"));
+                            quizQuestionsArrayList.add(new QuizQuestions(questionID,question,optionA,optionB,optionC,optionD,answer));
                             questionsID.add(questionID);
                         }
                     }
@@ -122,6 +145,7 @@ public class PlayQuizActivity extends AppCompatActivity {
                     finalDatabaseReference.keepSynced(false);
                     findViewById(R.id.button17).setOnClickListener(v -> finish());
                 }
+                loadNextQuestion();
             }
 
             @Override
@@ -131,14 +155,27 @@ public class PlayQuizActivity extends AppCompatActivity {
         });
     }
 
-    public static boolean isConnectionAvailable(Context context) {
-        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (connectivityManager != null) {
-            NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-            return networkInfo != null && networkInfo.isConnected()
-                    && networkInfo.isConnectedOrConnecting()
-                    && networkInfo.isAvailable();
+    public void loadNextQuestion(){
+        if (quizQuestionsArrayList.size() > 0){
+            for (int i = 0; i<quizQuestionsArrayList.size(); i++){
+                if (!answeredQuestions.contains(quizQuestionsArrayList.get(i).getQuestionID())){
+                    String question = quizQuestionsArrayList.get(i).getQuestion();
+                    String optionA = quizQuestionsArrayList.get(i).getOptionA();
+                    String optionB = quizQuestionsArrayList.get(i).getOptionB();
+                    String optionC = quizQuestionsArrayList.get(i).getOptionC();
+                    String optionD = quizQuestionsArrayList.get(i).getOptionD();
+                    questionTextView.setText(question);
+                    buttonA.setText(optionA);
+                    buttonB.setText(optionB);
+                    buttonC.setText(optionC);
+                    buttonD.setText(optionD);
+                    currentAnswer = quizQuestionsArrayList.get(i).getAnswer();
+                    answeredQuestions.add(quizQuestionsArrayList.get(i).getQuestionID());
+                    break;
+                }
+            }
+        }else {
+            Toast.makeText(this, "We are setting-up server...", Toast.LENGTH_SHORT).show();
         }
-        return false;
     }
 }

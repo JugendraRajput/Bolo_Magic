@@ -2,36 +2,36 @@ package bolomagic.in.AdaptorAndParse;
 
 public class LifafaReceivedHistoryParse {
     private final String ID;
-    private final String receiverName;
-    private final String receivedTime;
-    private final String won;
-    private final String status;
+    private final String senderProfilePic;
+    private final String senderName;
+    private final String message;
+    private final String date;
 
-    public LifafaReceivedHistoryParse(String ID, String receiverName, String receivedTime, String won, String status) {
+    public LifafaReceivedHistoryParse(String ID, String senderProfilePic, String senderName, String message, String date) {
         this.ID = ID;
-        this.receiverName = receiverName;
-        this.receivedTime = receivedTime;
-        this.won = won;
-        this.status = status;
+        this.senderProfilePic = senderProfilePic;
+        this.senderName = senderName;
+        this.message = message;
+        this.date = date;
     }
 
     public String getID() {
         return ID;
     }
 
-    public String getReceiverName() {
-        return receiverName;
+    public String getSenderProfilePic() {
+        return senderProfilePic;
     }
 
-    public String getReceivedTime() {
-        return receivedTime;
+    public String getSenderName() {
+        return senderName;
     }
 
-    public String getWon() {
-        return won;
+    public String getMessage() {
+        return message;
     }
 
-    public String getStatus() {
-        return status;
+    public String getDate() {
+        return date;
     }
 }

@@ -2,48 +2,36 @@ package bolomagic.in.AdaptorAndParse;
 
 public class LifafaCreatedHistoryParse {
     private final String ID;
-    private final String receiverName;
-    private final String creationTime;
-    private final String totalBalance;
-    private final String availableAmount;
-    private final String status;
-    private final String link;
+    private final String imageURL;
+    private final String count;
+    private final String message;
+    private final String totalAmount;
 
-    public LifafaCreatedHistoryParse(String ID, String receiverName, String creationTime, String totalBalance, String availableAmount, String status, String link) {
+    public LifafaCreatedHistoryParse(String ID, String imageURL, String count, String message, String totalAmount) {
         this.ID = ID;
-        this.receiverName = receiverName;
-        this.creationTime = creationTime;
-        this.totalBalance = totalBalance;
-        this.availableAmount = availableAmount;
-        this.status = status;
-        this.link = link;
+        this.imageURL = imageURL;
+        this.count = count;
+        this.message = message;
+        this.totalAmount = totalAmount;
     }
 
     public String getID() {
         return ID;
     }
 
-    public String getReceiverName() {
-        return receiverName;
+    public String getImageURL() {
+        return imageURL;
     }
 
-    public String getCreationTime() {
-        return creationTime;
+    public String getCount() {
+        return count;
     }
 
-    public String getTotalBalance() {
-        return totalBalance;
+    public String getMessage() {
+        return message;
     }
 
-    public String getAvailableAmount() {
-        return availableAmount;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public String getLink() {
-        return link;
+    public String getTotalAmount() {
+        return totalAmount;
     }
 }

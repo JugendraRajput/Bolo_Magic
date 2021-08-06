@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="bolomagic.in">
+    package="bolomagic.in" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -11,26 +11,27 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme" >
+        <activity android:name=".LifafaDetailsActivity" />
         <activity android:name=".CardHistoryActivity" />
         <activity android:name=".CartActivity" />
         <activity android:name=".PlayerID" />
         <activity android:name=".LifafaCreatedActivity" />
         <activity android:name=".LifafaReceivedActivity" />
-        <activity android:name=".CreateLifafaActivity" />
         <activity android:name=".CardCategoryActivity" />
         <activity android:name=".CardListActivity" />
         <activity android:name=".CheckInActivity" />
         <activity android:name=".ReferActivity" />
+        <activity android:name=".LifafaActivity" />
+        <activity
+            android:name=".CreateLifafaActivity"
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".PlayQuizActivity"
             android:theme="@style/NoActionBarTheme" />
         <activity
             android:name=".WithdrawActivity"
             android:theme="@style/NoActionBarTheme" />
-        <activity
-            android:name=".LifafaActivity"
-            android:label="@string/title_activity_lifafa" />
         <activity
             android:name=".PaymentActivity"
             android:theme="@style/NoActionBarTheme" />
@@ -42,7 +43,7 @@
             android:theme="@style/NoAnimTheme" />
         <activity
             android:name=".SplashActivity"
-            android:theme="@style/SplashScreenTheme">
+            android:theme="@style/SplashScreenTheme" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -63,7 +64,7 @@
         <service
             android:name=".SendNotificationPack.MyFireBaseMessagingService"
             android:enabled="true"
-            android:exported="false">
+            android:exported="false" >
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
@@ -71,7 +72,7 @@
         <service
             android:name=".SendNotificationPack.MyFirebaseIdService"
             android:enabled="true"
-            android:exported="false">
+            android:exported="false" >
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>

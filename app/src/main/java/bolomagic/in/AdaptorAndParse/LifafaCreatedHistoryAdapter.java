@@ -5,7 +5,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
 
 import bolomagic.in.R;
@@ -25,26 +29,21 @@ public class LifafaCreatedHistoryAdapter extends ArrayAdapter<LifafaCreatedHisto
 
         LifafaCreatedHistoryParse lifafaCreatedHistoryParse = getItem(position);
 
-        TextView textView1 = (TextView) listItemView.findViewById(R.id.textView32);
-        textView1.setText(lifafaCreatedHistoryParse.getID());
+        ImageView imageView = listItemView.findViewById(R.id.imageView);
+        Picasso.get().load(lifafaCreatedHistoryParse.getImageURL()).into(imageView);
 
-        TextView textView2 = (TextView) listItemView.findViewById(R.id.textView37);
-        textView2.setText(lifafaCreatedHistoryParse.getReceiverName());
+        TextView textView1 = listItemView.findViewById(R.id.textView1);
+        textView1.setText(lifafaCreatedHistoryParse.getCount()+" Lucky Lifafa");
 
-        TextView textView3 = (TextView) listItemView.findViewById(R.id.textView39);
-        textView3.setText(lifafaCreatedHistoryParse.getCreationTime());
+        TextView textView2 = listItemView.findViewById(R.id.textView2);
+        String message = lifafaCreatedHistoryParse.getMessage();
+        if (message.length() > 29){
+            message = message.substring(0,29)+"...";
+        }
+        textView2.setText(message);
 
-        TextView textView4 = (TextView) listItemView.findViewById(R.id.textView40);
-        textView4.setText(lifafaCreatedHistoryParse.getAvailableAmount());
-
-        TextView textView5 = (TextView) listItemView.findViewById(R.id.textView42);
-        textView5.setText(lifafaCreatedHistoryParse.getTotalBalance());
-
-        TextView textView6 = (TextView) listItemView.findViewById(R.id.textView44);
-        textView6.setText(lifafaCreatedHistoryParse.getStatus());
-
-        TextView textView7  = (TextView) listItemView.findViewById(R.id.textView49);
-        textView7.setText(lifafaCreatedHistoryParse.getLink());
+        TextView textView3 = listItemView.findViewById(R.id.textView3);
+        textView3.setText("₹ "+lifafaCreatedHistoryParse.getTotalAmount());
 
         return listItemView;
     }

@@ -94,6 +94,7 @@ public class CardListActivity extends AppCompatActivity {
                 .setCancelable(true)
                 .show();
     }
+
     public void Cart(View view) {
         ConstraintLayout constraintLayout = (ConstraintLayout) view.getParent();
         TextView textView = (TextView) constraintLayout.findViewById(R.id.cardIDTextView);

@@ -26,5 +26,11 @@
     <string name="player_id">Player ID</string>
     <string name="enter_player_id">Enter Player ID</string>
     <string name="save_id">Save ID</string>
+    <string name="spread_happiness">Spread Happiness</string>
+    <string name="send_lucky_money_to_your_friends_amp_family"><![CDATA[Send lucky money to your friends & family]]></string>
+    <string name="send_a_lucky_lifafa"><![CDATA[Send a Lucky Lifafa >]]></string>
+    <string name="or_send_lifafa_to_a_friend"><![CDATA[or Send Lifafa to a Friend >]]></string>
+    <string name="beta">Beta</string>
+    <string name="share">Share</string>
     <item name="item_click_support" type="id" />
 </resources>

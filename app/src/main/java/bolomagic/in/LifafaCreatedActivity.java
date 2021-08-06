@@ -38,13 +38,13 @@ public class LifafaCreatedActivity extends AppCompatActivity {
             UID = mAuth.getCurrentUser().getUid();
             LifafaCreatedListView = findViewById(R.id.LifafaCreatedListView);
             Picasso.get().load("https://res.cloudinary.com/dsznqkutd/image/upload/v1605114138/loading_bp9ico.png").into((ImageView) findViewById(R.id.LifafaCreatedImageView));
-            LoadLifafaCreatedHistory();
-        }else {
+            //LoadLifafaCreatedHistory();
+        } else {
             finish();
             startActivity(new Intent(LifafaCreatedActivity.this, AuthActivity.class));
         }
     }
-
+/*
     public void LoadLifafaCreatedHistory(){
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("SPL").child("Lifafa");
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -94,4 +94,6 @@ public class LifafaCreatedActivity extends AppCompatActivity {
             }
         });
     }
+
+*/
 }
