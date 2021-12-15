@@ -57,12 +57,20 @@ public class QuizListParse {
         return totalJoined;
     }
 
+    public void setTotalJoined(String totalJoined) {
+        this.totalJoined = totalJoined;
+    }
+
     public String getMaxJoined() {
         return maxJoined;
     }
 
     public String getIsJoined() {
         return isJoined;
+    }
+
+    public void setIsJoined(String isJoined) {
+        this.isJoined = isJoined;
     }
 
     public String getEntryFee() {
@@ -75,13 +83,5 @@ public class QuizListParse {
 
     public String getStatus() {
         return status;
-    }
-
-    public void setTotalJoined(String totalJoined) {
-        this.totalJoined = totalJoined;
-    }
-
-    public void setIsJoined(String isJoined) {
-        this.isJoined = isJoined;
     }
 }

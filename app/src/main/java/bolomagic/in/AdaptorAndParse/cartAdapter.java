@@ -29,7 +29,7 @@ public class cartAdapter extends ArrayAdapter<cartParse> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View listItemView = convertView;
-        if(listItemView == null) {
+        if (listItemView == null) {
             listItemView = LayoutInflater.from(getContext()).inflate(R.layout.cart_view, parent, false);
         }
 
@@ -55,9 +55,9 @@ public class cartAdapter extends ArrayAdapter<cartParse> {
 
         Button button = (Button) listItemView.findViewById(R.id.button);
         button.setOnClickListener(v -> {
-            String string = "How To Redeem"+"\n\t1. Download & Login into PayTm App." +
+            String string = "How To Redeem" + "\n\t1. Download & Login into PayTm App." +
                     "\n\t2. Go to Add Money.\n\t3. Goo to 'Have a PromoCode' and Enter the Code.\n\n" +
-                    "Where To Redeem"+"\n\tDownload & Login into PayTm App.\n\n" + "Terms"+
+                    "Where To Redeem" + "\n\tDownload & Login into PayTm App.\n\n" + "Terms" +
                     "\n\t1. Download & Login into PayTm App.\n\t2. Go to Add Money." +
                     "\n\t3. Go to 'Have a PromoCode' and Enter the Code.\n\t4. Valid for 7 from the date of issue of voucher.";
             new AlertDialog.Builder(getContext())
@@ -72,6 +72,7 @@ public class cartAdapter extends ArrayAdapter<cartParse> {
 
         return listItemView;
     }
+
     @Override
     public int getViewTypeCount() {
         return getCount();

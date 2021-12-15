@@ -1,9 +1,5 @@
 package bolomagic.in;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -13,6 +9,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -76,33 +76,33 @@ public class PlayQuizActivity extends AppCompatActivity {
         buttonD = findViewById(R.id.button14);
 
         reloadButton.setOnClickListener(v -> {
-            if (isConnectionAvailable(PlayQuizActivity.this)){
+            if (isConnectionAvailable(PlayQuizActivity.this)) {
                 loadingImageView.setImageResource(R.drawable.loading);
                 titleTextView.setText("Connecting...");
                 messageTextView.setText("We are trying to connect with our server.");
                 reloadButton.setVisibility(View.GONE);
                 init();
-            }else {
+            } else {
                 loadingImageView.setImageResource(R.drawable.pending_img);
                 titleTextView.setText("Connection not found");
                 messageTextView.setText("It looks like that you are not connected to a active internet connection " +
-                        "OR you have disabled internet usage permission for "+R.string.app_name);
+                        "OR you have disabled internet usage permission for " + R.string.app_name);
                 reloadButton.setVisibility(View.VISIBLE);
             }
         });
 
-        if (isConnectionAvailable(this)){
+        if (isConnectionAvailable(this)) {
             init();
-        }else {
+        } else {
             loadingImageView.setImageResource(R.drawable.pending_img);
             titleTextView.setText("Connection not found");
             messageTextView.setText("It looks like that you are not connected to a active internet connection " +
-                    "OR you have disabled internet usage permission for "+R.string.app_name);
+                    "OR you have disabled internet usage permission for " + R.string.app_name);
             reloadButton.setVisibility(View.VISIBLE);
         }
     }
 
-    private void init(){
+    private void init() {
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
         databaseReference = databaseReference.child("SPL").child("Quiz").child(quizID);
         DatabaseReference finalDatabaseReference = databaseReference;
@@ -113,29 +113,29 @@ public class PlayQuizActivity extends AppCompatActivity {
                 loadingImageView.setImageResource(R.drawable.verified_img);
                 titleTextView.setText("Connection Successful");
                 messageTextView.setText("You are connected with server.");
-                if (snapshot.hasChild("Message")){
+                if (snapshot.hasChild("Message")) {
                     messageTextView.setText(snapshot.child("Message").getValue().toString());
                 }
 
-                if (snapshot.hasChild("Questions")){
+                if (snapshot.hasChild("Questions")) {
                     loading_Layout.setVisibility(View.GONE);
                     quiz_Layout.setVisibility(View.VISIBLE);
                     Iterable<DataSnapshot> dataSnapshotIterable = snapshot.child("Questions").getChildren();
-                    for (DataSnapshot next : dataSnapshotIterable){
+                    for (DataSnapshot next : dataSnapshotIterable) {
                         String questionID = next.getKey();
-                        if (!questionsID.contains(questionID)){
+                        if (!questionsID.contains(questionID)) {
                             String question = next.child("Question").getValue().toString();
                             String answer = next.child("Answer").getValue().toString();
                             String optionA = next.child("Option A").getValue().toString();
                             String optionB = next.child("Option B").getValue().toString();
                             String optionC = next.child("Option C").getValue().toString();
                             String optionD = next.child("Option D").getValue().toString();
-                            quizQuestionsArrayList.add(new QuizQuestions(questionID,question,optionA,optionB,optionC,optionD,answer));
+                            quizQuestionsArrayList.add(new QuizQuestions(questionID, question, optionA, optionB, optionC, optionD, answer));
                             questionsID.add(questionID);
                         }
                     }
                 }
-                if (quizStatus.equals("Ended")){
+                if (quizStatus.equals("Ended")) {
                     loading_Layout.setVisibility(View.GONE);
                     quiz_Layout.setVisibility(View.GONE);
                     TextView textView76 = findViewById(R.id.textView76);
@@ -155,10 +155,10 @@ public class PlayQuizActivity extends AppCompatActivity {
         });
     }
 
-    public void loadNextQuestion(){
-        if (quizQuestionsArrayList.size() > 0){
-            for (int i = 0; i<quizQuestionsArrayList.size(); i++){
-                if (!answeredQuestions.contains(quizQuestionsArrayList.get(i).getQuestionID())){
+    public void loadNextQuestion() {
+        if (quizQuestionsArrayList.size() > 0) {
+            for (int i = 0; i < quizQuestionsArrayList.size(); i++) {
+                if (!answeredQuestions.contains(quizQuestionsArrayList.get(i).getQuestionID())) {
                     String question = quizQuestionsArrayList.get(i).getQuestion();
                     String optionA = quizQuestionsArrayList.get(i).getOptionA();
                     String optionB = quizQuestionsArrayList.get(i).getOptionB();
@@ -174,7 +174,7 @@ public class PlayQuizActivity extends AppCompatActivity {
                     break;
                 }
             }
-        }else {
+        } else {
             Toast.makeText(this, "We are setting-up server...", Toast.LENGTH_SHORT).show();
         }
     }

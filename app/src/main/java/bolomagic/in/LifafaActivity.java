@@ -4,6 +4,20 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.Window;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
@@ -14,22 +28,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
-import androidx.constraintlayout.widget.ConstraintLayout;
-
-import android.os.Handler;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.Window;
-import android.view.animation.AccelerateDecelerateInterpolator;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -43,14 +41,13 @@ import bolomagic.in.AdaptorAndParse.LifafaReceivedHistoryParse;
 
 public class LifafaActivity extends AppCompatActivity {
 
+    final int[] x = {0};
     String UID;
     double winingAmount = 0.0;
     String lifafaID = "DEFAULT";
-    ImageView lifafaLoadingImageView,lifafaExpiredImageView;
+    ImageView lifafaLoadingImageView, lifafaExpiredImageView;
     TextView lifafaFailedMessageTextView;
     CardView lifafaResultLayout;
-    final int[] x = {0};
-
     ArrayList<LifafaCreatedHistoryParse> lifafaCreatedHistoryParseArrayList = new ArrayList<>();
     LifafaCreatedHistoryAdapter lifafaCreatedHistoryAdapter;
     boolean isLifafaCreationHistoryLoaded = false;
@@ -78,17 +75,17 @@ public class LifafaActivity extends AppCompatActivity {
 
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         FirebaseUser mFirebaseUser = mAuth.getCurrentUser();
-        if(mFirebaseUser != null) {
+        if (mFirebaseUser != null) {
             UID = mFirebaseUser.getUid();
-            
+
             findViewById(R.id.button1).setOnClickListener(v -> {
-                Intent intent = new Intent(LifafaActivity.this,CreateLifafaActivity.class);
+                Intent intent = new Intent(LifafaActivity.this, CreateLifafaActivity.class);
                 intent.putExtra("Lifafa Type", "GROUP");
-                startActivity(intent);    
+                startActivity(intent);
             });
-            
+
             findViewById(R.id.textView3).setOnClickListener(v -> {
-                Intent intent = new Intent(LifafaActivity.this,CreateLifafaActivity.class);
+                Intent intent = new Intent(LifafaActivity.this, CreateLifafaActivity.class);
                 intent.putExtra("Lifafa Type", "FRIEND");
                 startActivity(intent);
             });
@@ -101,7 +98,7 @@ public class LifafaActivity extends AppCompatActivity {
             lifafaReceivedHistoryAdapter = new LifafaReceivedHistoryAdapter(LifafaActivity.this, lifafaReceivedHistoryParseArrayList);
 
             listView.setOnItemClickListener((parent, view, position, id) -> {
-                if (listView.getAdapter().equals(lifafaCreatedHistoryAdapter)){
+                if (listView.getAdapter().equals(lifafaCreatedHistoryAdapter)) {
                     String lifafaID = lifafaCreatedHistoryParseArrayList.get(position).getID();
                     Intent intent = new Intent(LifafaActivity.this, LifafaDetailsActivity.class);
                     intent.putExtra("Lifafa ID", lifafaID);
@@ -109,7 +106,7 @@ public class LifafaActivity extends AppCompatActivity {
                     startActivity(intent);
                 }
 
-                if (listView.getAdapter().equals(lifafaReceivedHistoryAdapter)){
+                if (listView.getAdapter().equals(lifafaReceivedHistoryAdapter)) {
                     String lifafaID = lifafaReceivedHistoryParseArrayList.get(position).getID();
                     Intent intent = new Intent(LifafaActivity.this, LifafaDetailsActivity.class);
                     intent.putExtra("Lifafa ID", lifafaID);
@@ -125,12 +122,12 @@ public class LifafaActivity extends AppCompatActivity {
             tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
                 @Override
                 public void onTabSelected(TabLayout.Tab tab) {
-                    if (tab.getText().equals("Received")){
+                    if (tab.getText().equals("Received")) {
                         listView.setAdapter(lifafaReceivedHistoryAdapter);
                         LoadLifafaReceivedHistory();
                     }
 
-                    if (tab.getText().equals("Sent")){
+                    if (tab.getText().equals("Sent")) {
                         listView.setAdapter(lifafaCreatedHistoryAdapter);
                         LoadLifafaCreatedHistory();
                     }
@@ -151,7 +148,21 @@ public class LifafaActivity extends AppCompatActivity {
             LoadLifafaReceivedHistory();
 
             lifafaID = getIntent().getStringExtra("Lifafa ID");
-            if (!lifafaID.equals("DEFAULT")){
+            if (!lifafaID.equals("DEFAULT")) {
+
+                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("SPL/Users/" + UID + "/Personal Information/Wallets/");
+                databaseReference.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        winingAmount = Double.parseDouble(snapshot.child("Wining Amount").getValue().toString());
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        ShowToast(error.toString());
+                    }
+                });
+
                 findViewById(R.id.button5).setOnClickListener(v -> HideReceivingLayout());
                 findViewById(R.id.lifafaWalletLayout).setVisibility(View.GONE);
                 findViewById(R.id.lifafaReceivingLayout).setVisibility(View.VISIBLE);
@@ -163,11 +174,11 @@ public class LifafaActivity extends AppCompatActivity {
                 final Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     public void run() {
-                        if (x[0] == 0){
+                        if (x[0] == 0) {
                             lifafaLoadingImageView.animate().translationY(-150).setDuration(1000).start();
                             x[0] = 1;
                         }
-                        if(x[0] == 1){
+                        if (x[0] == 1) {
                             lifafaLoadingImageView.animate().translationY(0).setDuration(1000).start();
                             x[0] = 0;
                         }
@@ -176,21 +187,7 @@ public class LifafaActivity extends AppCompatActivity {
                 }, 2000);
                 GetLifafa();
             }
-
-            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("SPL/Users/"+UID+"/Personal Information/Wallets/");
-            databaseReference.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    winingAmount = Double.parseDouble(snapshot.child("Wining Amount").getValue().toString());
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-                    ShowToast(error.toString());
-                }
-            });
-            
-        }else {
+        } else {
             startActivity(new Intent(LifafaActivity.this, AuthActivity.class));
             finish();
         }
@@ -205,20 +202,20 @@ public class LifafaActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void LoadLifafaCreatedHistory(){
-        if (isLifafaCreationHistoryLoaded){
-            if (lifafaCreatedHistoryParseArrayList.size() < 1){
+    public void LoadLifafaCreatedHistory() {
+        if (isLifafaCreationHistoryLoaded) {
+            if (lifafaCreatedHistoryParseArrayList.size() < 1) {
                 listView.setVisibility(View.GONE);
                 loadingImageView.setVisibility(View.VISIBLE);
                 Picasso.get().load("https://res.cloudinary.com/dsznqkutd/image/upload/v1605424833/imageedit_9_7876917501_kdsobm.png").into(loadingImageView);
-            }else {
+            } else {
                 loadingImageView.setVisibility(View.GONE);
                 listView.setVisibility(View.VISIBLE);
             }
-        }else {
+        } else {
             listView.setVisibility(View.GONE);
             loadingImageView.setVisibility(View.VISIBLE);
-            if (lifafaDataSnapshot == null){
+            if (lifafaDataSnapshot == null) {
                 Picasso.get().load("https://res.cloudinary.com/dsznqkutd/image/upload/v1605114138/loading_bp9ico.png").into(loadingImageView);
                 DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("SPL").child("Lifafa");
                 databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -227,25 +224,25 @@ public class LifafaActivity extends AppCompatActivity {
                         lifafaDataSnapshot = snapshot;
                         Iterable<DataSnapshot> snapshotIterator = snapshot.getChildren();
                         for (DataSnapshot next : snapshotIterator) {
-                            if (next.child("Sender ID").getValue().toString().equals(UID)){
+                            if (next.child("Sender ID").getValue().toString().equals(UID)) {
                                 try {
                                     String ID = next.getKey();
                                     String imageURL = next.child("Short Image URL").getValue().toString();
                                     String count = next.child("Lifafa Count").getValue().toString();
                                     String message = next.child("Message").getValue().toString();
                                     String totalAmount = next.child("Amount").getValue().toString();
-                                    lifafaCreatedHistoryParseArrayList.add(new LifafaCreatedHistoryParse(ID,imageURL,count,message,totalAmount));
-                                }catch (Exception e){
-                                    ShowToast("We have found error on lifafa #"+next.getKey());
+                                    lifafaCreatedHistoryParseArrayList.add(new LifafaCreatedHistoryParse(ID, imageURL, count, message, totalAmount));
+                                } catch (Exception e) {
+                                    ShowToast("We have found error on lifafa #" + next.getKey());
                                 }
                             }
                         }
                         isLifafaCreationHistoryLoaded = true;
-                        if (lifafaCreatedHistoryParseArrayList.size() < 1){
+                        if (lifafaCreatedHistoryParseArrayList.size() < 1) {
                             listView.setVisibility(View.GONE);
                             loadingImageView.setVisibility(View.VISIBLE);
                             Picasso.get().load("https://res.cloudinary.com/dsznqkutd/image/upload/v1605424833/imageedit_9_7876917501_kdsobm.png").into(loadingImageView);
-                        }else {
+                        } else {
                             loadingImageView.setVisibility(View.GONE);
                             listView.setVisibility(View.VISIBLE);
                             lifafaCreatedHistoryAdapter.notifyDataSetChanged();
@@ -257,28 +254,28 @@ public class LifafaActivity extends AppCompatActivity {
                         ShowToast(error.toString());
                     }
                 });
-            }else {
+            } else {
                 Iterable<DataSnapshot> snapshotIterator = lifafaDataSnapshot.getChildren();
                 for (DataSnapshot next : snapshotIterator) {
-                    if (next.child("Sender ID").getValue().toString().equals(UID)){
+                    if (next.child("Sender ID").getValue().toString().equals(UID)) {
                         try {
                             String ID = next.getKey();
                             String imageURL = next.child("Short Image URL").getValue().toString();
                             String count = next.child("Lifafa Count").getValue().toString();
                             String message = next.child("Message").getValue().toString();
                             String totalAmount = next.child("Amount").getValue().toString();
-                            lifafaCreatedHistoryParseArrayList.add(new LifafaCreatedHistoryParse(ID,imageURL,count,message,totalAmount));
-                        }catch (Exception e){
-                            ShowToast("We have found error on lifafa #"+next.getKey());
+                            lifafaCreatedHistoryParseArrayList.add(new LifafaCreatedHistoryParse(ID, imageURL, count, message, totalAmount));
+                        } catch (Exception e) {
+                            ShowToast("We have found error on lifafa #" + next.getKey());
                         }
                     }
                 }
                 isLifafaCreationHistoryLoaded = true;
-                if (lifafaCreatedHistoryParseArrayList.size() < 1){
+                if (lifafaCreatedHistoryParseArrayList.size() < 1) {
                     listView.setVisibility(View.GONE);
                     loadingImageView.setVisibility(View.VISIBLE);
                     Picasso.get().load("https://res.cloudinary.com/dsznqkutd/image/upload/v1605424833/imageedit_9_7876917501_kdsobm.png").into(loadingImageView);
-                }else {
+                } else {
                     loadingImageView.setVisibility(View.GONE);
                     listView.setVisibility(View.VISIBLE);
                     lifafaCreatedHistoryAdapter.notifyDataSetChanged();
@@ -287,18 +284,18 @@ public class LifafaActivity extends AppCompatActivity {
         }
     }
 
-    public void LoadLifafaReceivedHistory(){
-        if (isLifafaReceivedHistoryLoaded){
-            if (lifafaReceivedHistoryParseArrayList.size() < 1){
+    public void LoadLifafaReceivedHistory() {
+        if (isLifafaReceivedHistoryLoaded) {
+            if (lifafaReceivedHistoryParseArrayList.size() < 1) {
                 listView.setVisibility(View.GONE);
                 loadingImageView.setVisibility(View.VISIBLE);
                 Picasso.get().load("https://res.cloudinary.com/dsznqkutd/image/upload/v1605424833/imageedit_9_7876917501_kdsobm.png").into(loadingImageView);
-            }else {
+            } else {
                 loadingImageView.setVisibility(View.GONE);
                 listView.setVisibility(View.VISIBLE);
             }
-        }else {
-            if (lifafaDataSnapshot == null){
+        } else {
+            if (lifafaDataSnapshot == null) {
                 listView.setVisibility(View.GONE);
                 loadingImageView.setVisibility(View.VISIBLE);
                 DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("SPL").child("Lifafa");
@@ -307,31 +304,28 @@ public class LifafaActivity extends AppCompatActivity {
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         Iterable<DataSnapshot> snapshotIterator = snapshot.getChildren();
                         for (DataSnapshot next : snapshotIterator) {
-                            if (next.hasChild("Received By")){
-                                if (next.child("Received By").hasChild(UID)){
+                            if (next.hasChild("Received By")) {
+                                if (next.child("Received By").hasChild(UID)) {
                                     try {
                                         String ID = next.getKey();
                                         String senderProfilePic = next.child("Sender Profile Pic").child(UID).child("Received On").getValue().toString();
                                         String senderName = next.child("Sender Name").getValue().toString();
                                         String message = next.child("Message").child(UID).child("Amount Received").getValue().toString();
-                                        String date = next.child("Created On").child("hh").getValue().toString()+
-                                                ":"+next.child("Created On").child("mm").getValue().toString()+
-                                                " || "+next.child("Created On").child("Date").getValue().toString()+
-                                                "/"+next.child("Created On").child("Month").getValue().toString()+
-                                                "/"+next.child("Created On").child("Year").getValue().toString();
-                                        lifafaReceivedHistoryParseArrayList.add(new LifafaReceivedHistoryParse(ID,senderProfilePic,senderName,message,date));
-                                    }catch (Exception e){
-                                        ShowToast("We have found error on lifafa #"+next.getKey());
+                                        String date = next.child("Created On").child("Date").getValue().toString() +
+                                                "-" + next.child("Created On").child("Month").getValue().toString();
+                                        lifafaReceivedHistoryParseArrayList.add(new LifafaReceivedHistoryParse(ID, senderProfilePic, senderName, message, date));
+                                    } catch (Exception e) {
+                                        ShowToast("We have found error on lifafa #" + next.getKey());
                                     }
                                 }
                             }
                         }
-                        isLifafaReceivedHistoryLoaded  = true;
-                        if (lifafaReceivedHistoryParseArrayList.size() < 1){
+                        isLifafaReceivedHistoryLoaded = true;
+                        if (lifafaReceivedHistoryParseArrayList.size() < 1) {
                             listView.setVisibility(View.GONE);
                             loadingImageView.setVisibility(View.VISIBLE);
                             Picasso.get().load("https://res.cloudinary.com/dsznqkutd/image/upload/v1605424833/imageedit_9_7876917501_kdsobm.png").into(loadingImageView);
-                        }else {
+                        } else {
                             loadingImageView.setVisibility(View.GONE);
                             listView.setVisibility(View.VISIBLE);
                             lifafaReceivedHistoryAdapter.notifyDataSetChanged();
@@ -343,34 +337,31 @@ public class LifafaActivity extends AppCompatActivity {
                         ShowToast(error.toString());
                     }
                 });
-            }else {
+            } else {
                 Iterable<DataSnapshot> snapshotIterator = lifafaDataSnapshot.getChildren();
                 for (DataSnapshot next : snapshotIterator) {
-                    if (next.hasChild("Received By")){
-                        if (next.child("Received By").hasChild(UID)){
+                    if (next.hasChild("Received By")) {
+                        if (next.child("Received By").hasChild(UID)) {
                             try {
                                 String ID = next.getKey();
                                 String senderProfilePic = next.child("Sender Profile Pic").child(UID).child("Received On").getValue().toString();
                                 String senderName = next.child("Sender Name").getValue().toString();
                                 String message = next.child("Message").child(UID).child("Amount Received").getValue().toString();
-                                String date = next.child("Created On").child("hh").getValue().toString()+
-                                        ":"+next.child("Created On").child("mm").getValue().toString()+
-                                        " || "+next.child("Created On").child("Date").getValue().toString()+
-                                        "/"+next.child("Created On").child("Month").getValue().toString()+
-                                        "/"+next.child("Created On").child("Year").getValue().toString();
-                                lifafaReceivedHistoryParseArrayList.add(new LifafaReceivedHistoryParse(ID,senderProfilePic,senderName,message,date));
-                            }catch (Exception e){
-                                ShowToast("We have found error on lifafa #"+next.getKey());
+                                String date = next.child("Created On").child("Date").getValue().toString() +
+                                        "-" + next.child("Created On").child("Month").getValue().toString();
+                                lifafaReceivedHistoryParseArrayList.add(new LifafaReceivedHistoryParse(ID, senderProfilePic, senderName, message, date));
+                            } catch (Exception e) {
+                                ShowToast("We have found error on lifafa #" + next.getKey());
                             }
                         }
                     }
                 }
-                isLifafaReceivedHistoryLoaded  = true;
-                if (lifafaReceivedHistoryParseArrayList.size() < 1){
+                isLifafaReceivedHistoryLoaded = true;
+                if (lifafaReceivedHistoryParseArrayList.size() < 1) {
                     listView.setVisibility(View.GONE);
                     loadingImageView.setVisibility(View.VISIBLE);
                     Picasso.get().load("https://res.cloudinary.com/dsznqkutd/image/upload/v1605424833/imageedit_9_7876917501_kdsobm.png").into(loadingImageView);
-                }else {
+                } else {
                     loadingImageView.setVisibility(View.GONE);
                     listView.setVisibility(View.VISIBLE);
                     lifafaReceivedHistoryAdapter.notifyDataSetChanged();
@@ -380,64 +371,75 @@ public class LifafaActivity extends AppCompatActivity {
         }
     }
 
-    public void ShowToast(String message){
+    public void ShowToast(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
-    public void HideReceivingLayout(){
+    public void HideReceivingLayout() {
         findViewById(R.id.lifafaWalletLayout).setVisibility(View.VISIBLE);
         findViewById(R.id.lifafaReceivingLayout).setVisibility(View.GONE);
     }
 
-    public void GetLifafa(){
+    public void GetLifafa() {
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("SPL").child("Lifafa");
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.hasChild(lifafaID)){
-                    if (snapshot.child(lifafaID).child("Sender ID").getValue().toString().equals(UID)){
-                        //You can't claim this Lifafa !
-                        lifafaExpiredImageView.setVisibility(View.VISIBLE);
-                        lifafaFailedMessageTextView.setVisibility(View.VISIBLE);
-                        lifafaFailedMessageTextView.setText("You can't claim your own lifafa :)");
-                        x[0] = 2;
-                        lifafaLoadingImageView.animate().translationY(0).setDuration(0).start();
-                        findViewById(R.id.button5).setVisibility(View.VISIBLE);
-                    }else {
-                        if (snapshot.child(lifafaID).hasChild("Received By")){
-                            if (snapshot.child(lifafaID).child("Received By").hasChild(UID)){
-                                //Already lifafa Received...!
-                                lifafaExpiredImageView.setVisibility(View.VISIBLE);
-                                lifafaFailedMessageTextView.setVisibility(View.VISIBLE);
-                                lifafaFailedMessageTextView.setText("You have already received this lifafa :)");
-                                x[0] = 2;
-                                lifafaLoadingImageView.animate().translationY(0).setDuration(0).start();
-                                findViewById(R.id.button5).setVisibility(View.VISIBLE);
-                            }else {
+                if (snapshot.hasChild(lifafaID)) {
+                    if (snapshot.child(lifafaID).child("Status").getValue().toString().equals("Running")) {
+                        if (snapshot.child(lifafaID).child("Sender ID").getValue().toString().equals(UID)) {
+                            //You can't claim this Lifafa !
+                            lifafaExpiredImageView.setVisibility(View.VISIBLE);
+                            lifafaFailedMessageTextView.setVisibility(View.VISIBLE);
+                            lifafaFailedMessageTextView.setText("You can't claim your own lifafa :)");
+                            x[0] = 2;
+                            lifafaLoadingImageView.animate().translationY(0).setDuration(0).start();
+                            findViewById(R.id.button5).setVisibility(View.VISIBLE);
+                        } else {
+                            if (snapshot.child(lifafaID).hasChild("Received By")) {
+                                if (snapshot.child(lifafaID).child("Received By").hasChild(UID)) {
+                                    //Already lifafa Received...!
+                                    lifafaExpiredImageView.setVisibility(View.VISIBLE);
+                                    lifafaFailedMessageTextView.setVisibility(View.VISIBLE);
+                                    lifafaFailedMessageTextView.setText("You have already received this lifafa :)");
+                                    x[0] = 2;
+                                    lifafaLoadingImageView.animate().translationY(0).setDuration(0).start();
+                                    findViewById(R.id.button5).setVisibility(View.VISIBLE);
+                                } else {
+                                    //Receiving Process Started
+                                    lifafaLoadingImageView.animate().translationY(-500).scaleY(3).scaleX(3)
+                                            .setInterpolator(new AccelerateDecelerateInterpolator()).alpha(0).setDuration(500).start();
+                                    lifafaResultLayout.animate().translationY(0).scaleY(1).scaleX(1)
+                                            .setInterpolator(new AccelerateDecelerateInterpolator()).alpha(1).setDuration(500).start();
+                                    int receivedBy = (int) snapshot.child(lifafaID).child("Received By").getChildrenCount();
+                                    int MaxReceivers = Integer.parseInt(snapshot.child(lifafaID).child("Lifafa Count").getValue().toString());
+                                    LifafaReceivingProcess(snapshot, lifafaID, receivedBy, MaxReceivers);
+                                }
+                            } else {
                                 //Receiving Process Started
                                 lifafaLoadingImageView.animate().translationY(-500).scaleY(3).scaleX(3)
                                         .setInterpolator(new AccelerateDecelerateInterpolator()).alpha(0).setDuration(500).start();
                                 lifafaResultLayout.animate().translationY(0).scaleY(1).scaleX(1)
                                         .setInterpolator(new AccelerateDecelerateInterpolator()).alpha(1).setDuration(500).start();
-                                int receivedBy = (int) snapshot.child(lifafaID).child("Received By").getChildrenCount();
                                 int MaxReceivers = Integer.parseInt(snapshot.child(lifafaID).child("Lifafa Count").getValue().toString());
-                                LifafaReceivingProcess(snapshot,lifafaID,receivedBy,MaxReceivers);
+                                LifafaReceivingProcess(snapshot, lifafaID, 0, MaxReceivers);
                             }
-                        }else {
-                            //Receiving Process Started
-                            lifafaLoadingImageView.animate().translationY(-500).scaleY(3).scaleX(3)
-                                    .setInterpolator(new AccelerateDecelerateInterpolator()).alpha(0).setDuration(500).start();
-                            lifafaResultLayout.animate().translationY(0).scaleY(1).scaleX(1)
-                                    .setInterpolator(new AccelerateDecelerateInterpolator()).alpha(1).setDuration(500).start();
-                            int MaxReceivers = Integer.parseInt(snapshot.child(lifafaID).child("Lifafa Count").getValue().toString());
-                            LifafaReceivingProcess(snapshot,lifafaID,0,MaxReceivers);
                         }
                     }
-                }else {
+                    if (snapshot.child(lifafaID).child("Status").getValue().toString().equals("Completed")) {
+                        //Lifafa Completed
+                        lifafaExpiredImageView.setVisibility(View.VISIBLE);
+                        lifafaFailedMessageTextView.setVisibility(View.VISIBLE);
+                        lifafaFailedMessageTextView.setText("Lifafa, that you want to claim has been completed.");
+                        x[0] = 2;
+                        lifafaLoadingImageView.animate().translationY(0).setDuration(0).start();
+                        findViewById(R.id.button5).setVisibility(View.VISIBLE);
+                    }
+                } else {
                     //Invalid Lifafa ID
                     lifafaExpiredImageView.setVisibility(View.VISIBLE);
                     lifafaFailedMessageTextView.setVisibility(View.VISIBLE);
-                    lifafaFailedMessageTextView.setText("Invalid Lifafa OR Expired :)");
+                    lifafaFailedMessageTextView.setText("Invalid Lifafa OR Expired !");
                     x[0] = 2;
                     lifafaLoadingImageView.animate().translationY(0).setDuration(0).start();
                     findViewById(R.id.button5).setVisibility(View.VISIBLE);
@@ -451,17 +453,21 @@ public class LifafaActivity extends AppCompatActivity {
         });
     }
 
-    private void LifafaReceivingProcess(DataSnapshot snapshot, String lifafaID, int receivedBy, int MaxReceivers){
+    private void LifafaReceivingProcess(DataSnapshot snapshot, String lifafaID, int receivedBy, int MaxReceivers) {
         String senderName;
         String profilePicURL = FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl().toString();
         String message = snapshot.child(lifafaID).child("Message").getValue().toString();
         String fullImageURL = snapshot.child(lifafaID).child("Full Image URL").getValue().toString();
         senderName = snapshot.child(lifafaID).child("Sender Name").getValue().toString();
-        if (message.equals("Default")){
+        if (message.equals("Default")) {
             message = "Enjoy Your Day :)";
         }
 
         int myReward = RewardCalculator(MaxReceivers);
+        String status = snapshot.child(lifafaID).child("Status").getValue().toString();
+        if (receivedBy >= (MaxReceivers - 1)) {
+            status = "Completed";
+        }
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MMM-yyy || hh:MM:ss");
         String receivedOn = simpleDateFormat.format(new Date());
@@ -471,26 +477,27 @@ public class LifafaActivity extends AppCompatActivity {
         databaseReference.child("Received By").child(UID).child("Received On").setValue(receivedOn);
         databaseReference.child("Received By").child(UID).child("Name").setValue(myName);
         databaseReference.child("Received By").child(UID).child("Profile Pic URL").setValue(profilePicURL);
+        databaseReference.child("Status").setValue(status);
         DatabaseReference databaseReference1 = FirebaseDatabase.getInstance().getReference().child("SPL").child("Users").child(UID).child("Personal Information").child("Wallets");
-        databaseReference1.child("Wining Amount").setValue(winingAmount+myReward);
+        databaseReference1.child("Wining Amount").setValue(winingAmount + myReward);
 
         TextView textView1 = findViewById(R.id.textView54);
         TextView textView2 = findViewById(R.id.textView56);
         TextView textView3 = findViewById(R.id.textView58);
         ImageView imageView = findViewById(R.id.imageView2);
         textView1.setText(senderName);
-        textView2.setText("You have received ₹"+myReward);
+        textView2.setText("You have received ₹" + myReward);
         textView3.setText(message);
         Picasso.get().load(fullImageURL).into(imageView);
         findViewById(R.id.button5).setVisibility(View.VISIBLE);
     }
 
-    public int RewardCalculator(int maxReceivers){
+    public int RewardCalculator(int maxReceivers) {
         int receivedAmount = 0;
         int receivedBy = 0;
         int totalAmount = Integer.parseInt(lifafaDataSnapshot.child(lifafaID).child("Amount").getValue().toString());
         Iterable<DataSnapshot> iterable = lifafaDataSnapshot.child(lifafaID).child("Received By").getChildren();
-        for (DataSnapshot next : iterable){
+        for (DataSnapshot next : iterable) {
             receivedAmount = receivedAmount + Integer.parseInt(next.child("Amount Received").getValue().toString());
             receivedBy++;
         }
@@ -498,7 +505,7 @@ public class LifafaActivity extends AppCompatActivity {
         int availableReceivers = maxReceivers - receivedBy;
         int availableAmount = totalAmount - receivedAmount;
 
-        int myRewardLimit = (availableAmount/availableReceivers)+1;
+        int myRewardLimit = (availableAmount / availableReceivers) + 1;
         Random random = new Random();
 
         return random.nextInt(myRewardLimit);

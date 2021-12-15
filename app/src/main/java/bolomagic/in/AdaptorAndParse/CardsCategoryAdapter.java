@@ -24,7 +24,7 @@ public class CardsCategoryAdapter extends ArrayAdapter<CardCategoryParse> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View listItemView = convertView;
-        if(listItemView == null) {
+        if (listItemView == null) {
             listItemView = LayoutInflater.from(getContext()).inflate(R.layout.card_category_view, parent, false);
         }
 

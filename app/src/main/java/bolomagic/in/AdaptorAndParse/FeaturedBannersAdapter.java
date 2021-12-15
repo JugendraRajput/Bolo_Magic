@@ -17,18 +17,11 @@ import bolomagic.in.R;
 
 public class FeaturedBannersAdapter extends RecyclerView.Adapter<FeaturedBannersAdapter.MyViewHolder> {
     private final List<FeaturedBannersParse> featuredBannersParses;
-    class MyViewHolder extends RecyclerView.ViewHolder {
-        TextView productID;
-        ImageView imageURL;
-        MyViewHolder(View view) {
-            super(view);
-            productID = view.findViewById(R.id.productIDTextView);
-            imageURL = view.findViewById(R.id.featuredImageView);
-        }
-    }
+
     public FeaturedBannersAdapter(List<FeaturedBannersParse> featuredBannersParses) {
         this.featuredBannersParses = featuredBannersParses;
     }
+
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -36,6 +29,7 @@ public class FeaturedBannersAdapter extends RecyclerView.Adapter<FeaturedBanners
                 .inflate(R.layout.featured_banners_view, parent, false);
         return new MyViewHolder(itemView);
     }
+
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
         FeaturedBannersParse featuredBannersParse = featuredBannersParses.get(position);
@@ -43,8 +37,20 @@ public class FeaturedBannersAdapter extends RecyclerView.Adapter<FeaturedBanners
         ImageView imageView = holder.imageURL.findViewById(R.id.featuredImageView);
         Picasso.get().load(featuredBannersParse.getImageURL()).into(imageView);
     }
+
     @Override
     public int getItemCount() {
         return featuredBannersParses.size();
+    }
+
+    class MyViewHolder extends RecyclerView.ViewHolder {
+        TextView productID;
+        ImageView imageURL;
+
+        MyViewHolder(View view) {
+            super(view);
+            productID = view.findViewById(R.id.productIDTextView);
+            imageURL = view.findViewById(R.id.featuredImageView);
+        }
     }
 }

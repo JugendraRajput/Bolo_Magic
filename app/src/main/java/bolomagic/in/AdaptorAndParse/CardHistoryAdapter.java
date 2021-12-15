@@ -26,7 +26,7 @@ public class CardHistoryAdapter extends ArrayAdapter<CardHistoryParse> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View listItemView = convertView;
-        if(listItemView == null) {
+        if (listItemView == null) {
             listItemView = LayoutInflater.from(getContext()).inflate(R.layout.card_history_view, parent, false);
         }
 
@@ -49,15 +49,15 @@ public class CardHistoryAdapter extends ArrayAdapter<CardHistoryParse> {
         textView80.setText(cardHistoryParse.getCode());
         TextView textView81 = listItemView.findViewById(R.id.textView81);
         button.setOnClickListener(v -> {
-            if (cardHistoryParse.getCode().equals("Default")){
+            if (cardHistoryParse.getCode().equals("Default")) {
                 button.setEnabled(false);
                 Toast.makeText(getContext(), "Code not available !", Toast.LENGTH_SHORT).show();
-            }else {
-                if (button.getText().toString().equals("VIEW CODE")){
+            } else {
+                if (button.getText().toString().equals("VIEW CODE")) {
                     button.setText("HIDE CODE");
                     textView80.setVisibility(View.VISIBLE);
                     textView81.setVisibility(View.VISIBLE);
-                }else {
+                } else {
                     button.setText("VIEW CODE");
                     textView80.setVisibility(View.GONE);
                     textView81.setVisibility(View.GONE);

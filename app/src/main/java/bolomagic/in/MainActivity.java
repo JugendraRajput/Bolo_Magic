@@ -1,12 +1,5 @@
 package bolomagic.in;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -20,6 +13,13 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.facebook.shimmer.ShimmerFrameLayout;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -50,38 +50,27 @@ import bolomagic.in.CustomDialog.CustomDialogJoin;
 
 public class MainActivity extends AppCompatActivity {
 
-    ConstraintLayout HomeScreen,ProfileScreen;
-    ImageView profilePicImageView;
-    TextView userNameTextView,userEmailTextView,userWithdrawTextView,userDepositTextView,userReferTextView;
-    Button withdrawButton,depositButton,referButton;
-
-    FirebaseAuth mAuth;
-    String Name,Email,WiningAmount,BonusAmount,ProfilePicture;
     public static String DepositAmount;
     public static String UID;
-
-    ShimmerFrameLayout homeShimmerViewContainer;
-
     public static ArrayList<HomeListParse> homeListParseArrayList = new ArrayList<>();
     public static HomeListAdapter homeListAdapter;
-
     public static ArrayList<QuizListParse> quizListParseArrayList = new ArrayList<>();
     public static QuizListAdaptor quizListAdaptor;
-
-    ListView listView;
-
     public static boolean isNewUser = false;
-
     public static DataSnapshot userDataSnapshot;
-
     public static int currentPosition = 0;
-
     public static String currentEventPlayerID = "Default";
-
+    public static int currentQuizPosition = 0;
+    ConstraintLayout HomeScreen, ProfileScreen;
+    ImageView profilePicImageView;
+    TextView userNameTextView, userEmailTextView, userWithdrawTextView, userDepositTextView, userReferTextView;
+    Button withdrawButton, depositButton, referButton;
+    FirebaseAuth mAuth;
+    String Name, Email, WiningAmount, BonusAmount, ProfilePicture;
+    ShimmerFrameLayout homeShimmerViewContainer;
+    ListView listView;
     BottomNavigationView bottomNavigationView;
     TabLayout tabLayout;
-
-    public static int currentQuizPosition = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser mFirebaseUser = mAuth.getCurrentUser();
-        if(mFirebaseUser != null) {
+        if (mFirebaseUser != null) {
             UID = mFirebaseUser.getUid();
         }
 
@@ -132,20 +121,26 @@ public class MainActivity extends AppCompatActivity {
                 .setOnItemClickListener((recyclerView, i, v) -> {
                     String productID = featuredBannersParses.get(i).getProductID();
                     if (productID.equals("REFER")) {
-                        startActivity(new Intent(MainActivity.this,ReferActivity.class));
+                        startActivity(new Intent(MainActivity.this, ReferActivity.class));
                     }
+
                     if (productID.equals("Gift Card")) {
-                        startActivity(new Intent(MainActivity.this,CardCategoryActivity.class));
+                        Intent intent = new Intent(MainActivity.this, FreeFireActivity.class);
+                        intent.putExtra("icon_url","https://cdn.searchenginejournal.com/wp-content/uploads/2014/11/youtube-change-url-6009ea4f8d221-1520x800.png");
+                        intent.putExtra("game_name","Free Fire");
+                        intent.putExtra("game_developer","JD Games");
+                        startActivity(intent);
+//                        startActivity(new Intent(MainActivity.this, CardCategoryActivity.class));
                     }
                     if (productID.equals("LIFAFA")) {
                         Intent intent = new Intent(MainActivity.this, LifafaActivity.class);
-                        intent.putExtra("Lifafa ID","DEFAULT");
+                        intent.putExtra("Lifafa ID", "DEFAULT");
                         startActivity(intent);
                     }
                 });
 
         listView.setOnItemClickListener((parent, view, position, id) -> {
-            if (listView.getAdapter().equals(homeListAdapter)){
+            if (listView.getAdapter().equals(homeListAdapter)) {
                 currentPosition = position;
                 CustomDialogHome customDialogHome = new CustomDialogHome(this);
                 customDialogHome.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -154,16 +149,17 @@ public class MainActivity extends AppCompatActivity {
                 layoutParams.gravity = Gravity.BOTTOM;
                 customDialogHome.getWindow().setAttributes(layoutParams);
                 customDialogHome.show();
-            }else {
-                currentQuizPosition = position;
-                CustomDialogJoin customDialogJoin = new CustomDialogJoin(this);
-                customDialogJoin.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
-                layoutParams.copyFrom(customDialogJoin.getWindow().getAttributes());
-                layoutParams.gravity = Gravity.BOTTOM;
-                customDialogJoin.getWindow().setAttributes(layoutParams);
-                customDialogJoin.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
-                customDialogJoin.show();
+            } else {
+                Toast.makeText(MainActivity.this, "Quizzes are unavailable", Toast.LENGTH_SHORT).show();
+//                currentQuizPosition = position;
+//                CustomDialogJoin customDialogJoin = new CustomDialogJoin(this);
+//                customDialogJoin.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+//                WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+//                layoutParams.copyFrom(customDialogJoin.getWindow().getAttributes());
+//                layoutParams.gravity = Gravity.BOTTOM;
+//                customDialogJoin.getWindow().setAttributes(layoutParams);
+//                customDialogJoin.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+//                customDialogJoin.show();
             }
         });
 
@@ -171,11 +167,11 @@ public class MainActivity extends AppCompatActivity {
         databaseReferenceBeta.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                FeaturedBannersParse featuredBannersParse1 = new FeaturedBannersParse("https://gos3.ibcdn.com/img-1587107388.jpg","REFER");
+                FeaturedBannersParse featuredBannersParse1 = new FeaturedBannersParse("https://tuitionpad.com/wp-content/uploads/2020/08/refer11.png", "REFER");
                 featuredBannersParses.add(featuredBannersParse1);
-                FeaturedBannersParse featuredBannersParse2 = new FeaturedBannersParse("https://res.cloudinary.com/dsznqkutd/image/upload/v1612112929/order_history_empty_y21mqu.png","Gift Card");
+                FeaturedBannersParse featuredBannersParse2 = new FeaturedBannersParse("https://d2j6dbq0eux0bg.cloudfront.net/default-store/giftcards/gift_card_003_1500px.jpg", "Gift Card");
                 featuredBannersParses.add(featuredBannersParse2);
-                FeaturedBannersParse featuredBannersParse3 = new FeaturedBannersParse("https://image.winudf.com/v2/image/Y29tLkVudmVsb3BlRGVzaWduLmdvbGRlbnN0dWRpb19zY3JlZW5fMV8xNTEyMTA5Mzk2XzAyOQ/screen-1.jpg?fakeurl=1&type=.jpg","LIFAFA");
+                FeaturedBannersParse featuredBannersParse3 = new FeaturedBannersParse("https://akm-img-a-in.tosshub.com/indiatoday/envelope647_121717051808_2.jpg", "LIFAFA");
                 featuredBannersParses.add(featuredBannersParse3);
                 featuredBannersAdapter.notifyDataSetChanged();
                 FeaturedBannersRecyclerView.setVisibility(View.VISIBLE);
@@ -184,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
 
                 Iterable<DataSnapshot> dataSnapshotIterable = snapshot.getChildren();
                 homeListParseArrayList.clear();
-                for (DataSnapshot next : dataSnapshotIterable){
+                for (DataSnapshot next : dataSnapshotIterable) {
                     try {
                         String eventID = next.getKey();
                         String image1URL = Objects.requireNonNull(next.child("Image1 URL").getValue()).toString();
@@ -198,11 +194,11 @@ public class MainActivity extends AppCompatActivity {
                         String appRating = Objects.requireNonNull(next.child("App Rating").getValue()).toString();
                         String appDiscount = Objects.requireNonNull(next.child("App Discount").getValue()).toString();
                         String appDiscountNewUser = Objects.requireNonNull(next.child("App Discount For New User").getValue()).toString();
-                        if (!status.equals("hide")){
-                            homeListParseArrayList.add(new HomeListParse(eventID,image1URL,image2URL,title,
-                                    message,status,appIcon,appName,appID,appRating,appDiscount,appDiscountNewUser));
+                        if (!status.equals("hide")) {
+                            homeListParseArrayList.add(new HomeListParse(eventID, image1URL, image2URL, title,
+                                    message, status, appIcon, appName, appID, appRating, appDiscount, appDiscountNewUser));
                         }
-                    }catch (NullPointerException e){
+                    } catch (NullPointerException e) {
                         Toast.makeText(MainActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
                     }
                 }
@@ -210,12 +206,19 @@ public class MainActivity extends AppCompatActivity {
                 homeListAdapter = new HomeListAdapter(MainActivity.this, homeListParseArrayList);
 
                 tabLayout.setVisibility(View.VISIBLE);
-                if (homeListParseArrayList.size() < 1){
+                if (homeListParseArrayList.size() < 1) {
                     listView.setVisibility(View.GONE);
                     findViewById(R.id.emptyLayout).setVisibility(View.VISIBLE);
-                }else {
+                } else {
                     listView.setVisibility(View.VISIBLE);
                 }
+
+                ///////////
+
+                tabLayout.setVisibility(View.GONE);
+                listView.setAdapter(homeListAdapter);
+
+                ///////////
 
                 final int[] x = {0};
                 final Handler handler = new Handler();
@@ -239,19 +242,19 @@ public class MainActivity extends AppCompatActivity {
         quizDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.hasChildren()){
+                if (snapshot.hasChildren()) {
                     Iterable<DataSnapshot> dataSnapshotIterable = snapshot.getChildren();
-                    for (DataSnapshot next : dataSnapshotIterable){
+                    for (DataSnapshot next : dataSnapshotIterable) {
                         String quizID = next.getKey();
                         String backgroundURL = "Default";
-                        if (next.hasChild("Background URL")){
+                        if (next.hasChild("Background URL")) {
                             backgroundURL = next.child("Background URL").getValue().toString();
                         }
 
                         String isJoined = "false";
                         String totalJoined = "0";
-                        if (next.hasChild("Joined Users")){
-                            if (next.child("Joined Users").hasChild(UID)){
+                        if (next.hasChild("Joined Users")) {
+                            if (next.child("Joined Users").hasChild(UID)) {
                                 isJoined = "true";
                             }
                             totalJoined = String.valueOf(next.child("Joined Users").getChildrenCount());
@@ -266,11 +269,11 @@ public class MainActivity extends AppCompatActivity {
                         String entryFee = next.child("Entry").getValue().toString();
                         String minimumJoined = next.child("minimum Joined").getValue().toString();
                         String status = next.child("Status").getValue().toString();
-                        quizListParseArrayList.add(new QuizListParse(quizID,backgroundURL,quizName,prizePool,startTime,endTime,totalJoined,maxJoined,isJoined,entryFee,minimumJoined,status));
+                        quizListParseArrayList.add(new QuizListParse(quizID, backgroundURL, quizName, prizePool, startTime, endTime, totalJoined, maxJoined, isJoined, entryFee, minimumJoined, status));
                     }
                     quizListAdaptor = new QuizListAdaptor(MainActivity.this, quizListParseArrayList);
-                    listView.setAdapter(quizListAdaptor);
-                }else {
+//                    listView.setAdapter(quizListAdaptor);
+                } else {
                     Toast.makeText(MainActivity.this, "No active quiz !", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -286,9 +289,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 userDataSnapshot = snapshot;
-                if (Objects.requireNonNull(snapshot.child("Security Information").child("Account Status").getValue()).toString().equals("GOOD")){
+                if (Objects.requireNonNull(snapshot.child("Security Information").child("Account Status").getValue()).toString().equals("GOOD")) {
                     Name = Objects.requireNonNull(snapshot.child("Personal Information").child("Name").getValue()).toString();
-                    Email= Objects.requireNonNull(snapshot.child("Personal Information").child("Email").getValue()).toString();
+                    Email = Objects.requireNonNull(snapshot.child("Personal Information").child("Email").getValue()).toString();
                     ProfilePicture = Objects.requireNonNull(snapshot.child("Personal Information").child("Profile Picture").getValue()).toString();
                     WiningAmount = Objects.requireNonNull(snapshot.child("Personal Information").child("Wallets").child("Wining Amount").getValue()).toString();
                     DepositAmount = Objects.requireNonNull(snapshot.child("Personal Information").child("Wallets").child("Deposit Amount").getValue()).toString();
@@ -297,7 +300,7 @@ public class MainActivity extends AppCompatActivity {
 
                     isNewUser = !snapshot.hasChild("Event Order History");
 
-                }else {
+                } else {
                     Toast.makeText(MainActivity.this, "Your account has been blocked...!", Toast.LENGTH_SHORT).show();
                     finish();
                 }
@@ -311,23 +314,23 @@ public class MainActivity extends AppCompatActivity {
 
         withdrawButton.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, WithdrawActivity.class);
-            intent.putExtra("Withdraw Type","Wallet");
+            intent.putExtra("Withdraw Type", "Wallet");
             startActivity(intent);
         });
 
         depositButton.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, PaymentActivity.class);
-            intent.putExtra("Wallet Type","Wallet");
+            intent.putExtra("Wallet Type", "Wallet");
             startActivity(intent);
         });
 
-        referButton.setOnClickListener(v -> startActivity(new Intent(MainActivity.this,ReferActivity.class)));
+        referButton.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, ReferActivity.class)));
 
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         loadBottomNavigation();
     }
 
-    public void Loader(){
+    public void Loader() {
         Picasso.get().load(ProfilePicture).into(profilePicImageView);
         userNameTextView.setText(Name);
         userEmailTextView.setText(Email);
@@ -336,19 +339,19 @@ public class MainActivity extends AppCompatActivity {
         userReferTextView.setText(String.format("₹ %s", BonusAmount));
     }
 
-    public void loadBottomNavigation(){
+    public void loadBottomNavigation() {
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
-            if (item.getItemId() == R.id.nav_home){
-                setTitle(R.string.app_name);
-                ProfileScreen.animate().translationX(100).alpha(0).setDuration(100).withEndAction(() ->{
+            if (item.getItemId() == R.id.nav_home) {
+                setTitle("Shop");
+                ProfileScreen.animate().translationX(100).alpha(0).setDuration(100).withEndAction(() -> {
                     ProfileScreen.setVisibility(View.GONE);
                     HomeScreen.setVisibility(View.VISIBLE);
                     HomeScreen.animate().translationX(0).alpha(1).setDuration(100);
                 });
             }
-            if (item.getItemId() == R.id.nav_profile){
-                setTitle("My Profile");
-                HomeScreen.animate().translationX(-100).alpha(0).setDuration(100).withEndAction(() ->{
+            if (item.getItemId() == R.id.nav_profile) {
+                setTitle("PLay");
+                HomeScreen.animate().translationX(-100).alpha(0).setDuration(100).withEndAction(() -> {
                     HomeScreen.setVisibility(View.GONE);
                     ProfileScreen.setVisibility(View.VISIBLE);
                     ProfileScreen.animate().translationX(0).alpha(1).setDuration(100);
@@ -358,18 +361,18 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void loadTabLayout(){
+    public void loadTabLayout() {
         tabLayout.addTab(tabLayout.newTab().setText("Quiz"));
         tabLayout.addTab(tabLayout.newTab().setText("Events"));
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                listView.animate().translationY(100).alpha(0).setDuration(100).withEndAction(() ->{
+                listView.animate().translationY(100).alpha(0).setDuration(100).withEndAction(() -> {
                     listView.animate().translationY(0).alpha(1).setDuration(100);
-                    if (tab.getPosition() == 0){
+                    if (tab.getPosition() == 0) {
                         listView.setAdapter(quizListAdaptor);
                     }
-                    if (tab.getPosition() == 1){
+                    if (tab.getPosition() == 1) {
                         listView.setAdapter(homeListAdapter);
                     }
                 });
@@ -390,14 +393,14 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if(bottomNavigationView.getSelectedItemId() == R.id.nav_profile){
-            ProfileScreen.animate().translationX(100).alpha(0).setDuration(100).withEndAction(() ->{
+        if (bottomNavigationView.getSelectedItemId() == R.id.nav_profile) {
+            ProfileScreen.animate().translationX(100).alpha(0).setDuration(100).withEndAction(() -> {
                 ProfileScreen.setVisibility(View.GONE);
                 HomeScreen.setVisibility(View.VISIBLE);
                 HomeScreen.animate().translationX(0).alpha(1).setDuration(100);
                 bottomNavigationView.setSelectedItemId(R.id.nav_home);
             });
-        }else {
+        } else {
             quizListParseArrayList.clear();
             super.onBackPressed();
         }

@@ -29,6 +29,17 @@ import java.util.Objects;
 
 public class SplashActivity extends AppCompatActivity {
 
+    public static boolean isConnectionAvailable(Context context) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager != null) {
+            NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+            return networkInfo != null && networkInfo.isConnected()
+                    && networkInfo.isConnectedOrConnecting()
+                    && networkInfo.isAvailable();
+        }
+        return false;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,7 +49,7 @@ public class SplashActivity extends AppCompatActivity {
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
 
-        if (isConnectionAvailable(this)){
+        if (isConnectionAvailable(this)) {
             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("SPL").child("Application Details");
             databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -49,16 +60,16 @@ public class SplashActivity extends AppCompatActivity {
                         for (DataSnapshot next : dataSnapshotIterable) {
                             bannedApps.add(Objects.requireNonNull(next.child("Package").getValue()).toString());
                         }
-                        if (!installedApps(bannedApps)){
-                            if (Integer.parseInt(Objects.requireNonNull(snapshot.child("Version Code").getValue()).toString()) == BuildConfig.VERSION_CODE){
+                        if (!installedApps(bannedApps)) {
+                            if (Integer.parseInt(Objects.requireNonNull(snapshot.child("Version Code").getValue()).toString()) == BuildConfig.VERSION_CODE) {
                                 FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-                                if (firebaseAuth.getCurrentUser() != null){
+                                if (firebaseAuth.getCurrentUser() != null) {
                                     Continue();
-                                }else {
+                                } else {
                                     startActivity(new Intent(SplashActivity.this, AuthActivity.class));
                                     finish();
                                 }
-                            }else {
+                            } else {
                                 new AlertDialog.Builder(SplashActivity.this)
                                         .setIcon(android.R.drawable.ic_lock_idle_alarm)
                                         .setTitle("Update Available")
@@ -71,11 +82,11 @@ public class SplashActivity extends AppCompatActivity {
                                         .setNegativeButton("Exit", (dialogInterface, i) -> finish())
                                         .show();
                             }
-                        }else {
+                        } else {
                             ShowToast("Security Manager does not allow you to open the app...!");
                             finish();
                         }
-                    }else {
+                    } else {
                         ShowToast("Security Manager unable to fetch data from server...!");
                         finish();
                     }
@@ -87,13 +98,13 @@ public class SplashActivity extends AppCompatActivity {
                     finish();
                 }
             });
-        }else {
+        } else {
             ShowToast("Network not available...!");
             finish();
         }
     }
 
-    public void Continue(){
+    public void Continue() {
         String s = "https://www.bolomagic.in/lifafa/id=";
         int i = s.length();
         FirebaseDynamicLinks.getInstance()
@@ -105,9 +116,9 @@ public class SplashActivity extends AppCompatActivity {
                         String LifafaID = String.valueOf(deepLink);
                         LifafaID = LifafaID.substring(i);
                         Intent intent = new Intent(SplashActivity.this, LifafaActivity.class);
-                        intent.putExtra("Lifafa ID",LifafaID);
+                        intent.putExtra("Lifafa ID", LifafaID);
                         startActivity(intent);
-                    }else {
+                    } else {
                         startActivity(new Intent(SplashActivity.this, MainActivity.class));
                     }
                     finish();
@@ -115,18 +126,18 @@ public class SplashActivity extends AppCompatActivity {
                 .addOnFailureListener(this, e -> ShowToast(e.toString()));
     }
 
-    public void ShowToast(String errorMessage){
+    public void ShowToast(String errorMessage) {
         Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show();
     }
 
     private boolean installedApps(ArrayList<String> bannedAppsList) {
         boolean returnStatus = false;
-        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.R){
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.R) {
             List<PackageInfo> packageInfoList = getPackageManager().getInstalledPackages(0);
             for (int i = 0; i < packageInfoList.size(); i++) {
                 PackageInfo packageInfo = packageInfoList.get(i);
                 String packageName = packageInfo.applicationInfo.packageName;
-                if (bannedAppsList.contains(packageName)){
+                if (bannedAppsList.contains(packageName)) {
                     returnStatus = true;
                     break;
                 }
@@ -134,16 +145,5 @@ public class SplashActivity extends AppCompatActivity {
         }
 
         return returnStatus;
-    }
-
-    public static boolean isConnectionAvailable(Context context) {
-        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (connectivityManager != null) {
-            NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-            return networkInfo != null && networkInfo.isConnected()
-                    && networkInfo.isConnectedOrConnecting()
-                    && networkInfo.isAvailable();
-        }
-        return false;
     }
 }

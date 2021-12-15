@@ -1,17 +1,17 @@
 package bolomagic.in;
 
-import androidx.appcompat.app.AppCompatActivity;
+import static bolomagic.in.MainActivity.UID;
+import static bolomagic.in.MainActivity.currentPosition;
+import static bolomagic.in.MainActivity.homeListParseArrayList;
 
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.google.firebase.database.FirebaseDatabase;
+import androidx.appcompat.app.AppCompatActivity;
 
-import static bolomagic.in.MainActivity.UID;
-import static bolomagic.in.MainActivity.currentPosition;
-import static bolomagic.in.MainActivity.homeListParseArrayList;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class PlayerID extends AppCompatActivity {
 
@@ -25,13 +25,13 @@ public class PlayerID extends AppCompatActivity {
 
         button.setOnClickListener(v -> {
             String playerID = editText.getText().toString();
-            if (!playerID.equals("")){
+            if (!playerID.equals("")) {
                 String eventID = homeListParseArrayList.get(currentPosition).getEventID();
                 FirebaseDatabase.getInstance().getReference().child("SPL").child("Users").child(UID).child("Event Player IDs").child(eventID).child("Player ID").setValue(playerID).addOnCompleteListener(task -> {
                     Toast.makeText(PlayerID.this, "Player id has been successfully saved.", Toast.LENGTH_SHORT).show();
                     finish();
                 });
-                }else {
+            } else {
                 Toast.makeText(PlayerID.this, "Please enter valid player id !", Toast.LENGTH_SHORT).show();
             }
         });

@@ -23,7 +23,7 @@ public class LifafaCreatedHistoryAdapter extends ArrayAdapter<LifafaCreatedHisto
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View listItemView = convertView;
-        if(listItemView == null) {
+        if (listItemView == null) {
             listItemView = LayoutInflater.from(getContext()).inflate(R.layout.lifafa_created_history_view, parent, false);
         }
 
@@ -33,17 +33,17 @@ public class LifafaCreatedHistoryAdapter extends ArrayAdapter<LifafaCreatedHisto
         Picasso.get().load(lifafaCreatedHistoryParse.getImageURL()).into(imageView);
 
         TextView textView1 = listItemView.findViewById(R.id.textView1);
-        textView1.setText(lifafaCreatedHistoryParse.getCount()+" Lucky Lifafa");
+        textView1.setText(lifafaCreatedHistoryParse.getCount() + " Lucky Lifafa");
 
         TextView textView2 = listItemView.findViewById(R.id.textView2);
         String message = lifafaCreatedHistoryParse.getMessage();
-        if (message.length() > 29){
-            message = message.substring(0,29)+"...";
+        if (message.length() > 29) {
+            message = message.substring(0, 29) + "...";
         }
         textView2.setText(message);
 
         TextView textView3 = listItemView.findViewById(R.id.textView3);
-        textView3.setText("₹ "+lifafaCreatedHistoryParse.getTotalAmount());
+        textView3.setText("₹ " + lifafaCreatedHistoryParse.getTotalAmount());
 
         return listItemView;
     }

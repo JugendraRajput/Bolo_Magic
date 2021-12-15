@@ -1,5 +1,8 @@
 package bolomagic.in.CustomDialog;
 
+import static bolomagic.in.MainActivity.isNewUser;
+import static bolomagic.in.MainActivity.userDataSnapshot;
+
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.ComponentName;
@@ -32,9 +35,6 @@ import bolomagic.in.AdaptorAndParse.HomePopUpCardParse;
 import bolomagic.in.MainActivity;
 import bolomagic.in.R;
 
-import static bolomagic.in.MainActivity.isNewUser;
-import static bolomagic.in.MainActivity.userDataSnapshot;
-
 public class CustomDialogHome extends Dialog implements View.OnClickListener {
 
     public Activity activity;
@@ -61,10 +61,10 @@ public class CustomDialogHome extends Dialog implements View.OnClickListener {
         init();
     }
 
-    public void init(){
+    public void init() {
         int position = MainActivity.currentPosition;
         String status = MainActivity.homeListParseArrayList.get(position).getStatus();
-        if (status.equals("Active")){
+        if (status.equals("Active")) {
             String eventID = MainActivity.homeListParseArrayList.get(position).getEventID();
             String appIcon = MainActivity.homeListParseArrayList.get(position).getAppIcon();
             String appName = MainActivity.homeListParseArrayList.get(position).getAppName();
@@ -81,21 +81,21 @@ public class CustomDialogHome extends Dialog implements View.OnClickListener {
             textView1.setText(appName);
             textView2.setText(appRating);
             int finalDiscount = 0;
-            if (appDiscount.equals("hide")){
+            if (appDiscount.equals("hide")) {
                 textView3.setText("No Discount\nAvailable");
-                if (isNewUser){
-                    textView4.setText(appDiscountNewUser+"% discount applicable only for you.");
+                if (isNewUser) {
+                    textView4.setText(appDiscountNewUser + "% discount applicable only for you.");
                     finalDiscount = Integer.parseInt(appDiscountNewUser);
-                }else {
+                } else {
                     textView4.setText("Instant Creation in your account.");
                 }
-            }else {
-                textView3.setText("Discounted Prize\nupto "+appDiscount+"%");
-                if (isNewUser){
-                    textView4.setText(appDiscountNewUser+"% discount applicable only for you, "+appDiscount+"% extra discount when you buy this event card.");
+            } else {
+                textView3.setText("Discounted Prize\nupto " + appDiscount + "%");
+                if (isNewUser) {
+                    textView4.setText(appDiscountNewUser + "% discount applicable only for you, " + appDiscount + "% extra discount when you buy this event card.");
                     finalDiscount = Integer.parseInt(appDiscountNewUser) + Integer.parseInt(appDiscount);
-                }else {
-                    textView4.setText(appDiscount+"% extra discount when you buy this event card.");
+                } else {
+                    textView4.setText(appDiscount + "% extra discount when you buy this event card.");
                     finalDiscount = Integer.parseInt(appDiscount);
                 }
 
@@ -109,12 +109,12 @@ public class CustomDialogHome extends Dialog implements View.OnClickListener {
             carRecyclerView.setItemAnimator(new DefaultItemAnimator());
             carRecyclerView.setAdapter(homePopUpCardAdapter);
             LoadEventCards(finalDiscount, eventID, homePopUpCardAdapter, homePopUpCardParses);
-        }else {
+        } else {
             Toast.makeText(activity, "Event has been ended !", Toast.LENGTH_SHORT).show();
         }
     }
 
-    public void LoadEventCards(int discount, String eventID, HomePopUpCardAdapter homePopUpCardAdapter, List<HomePopUpCardParse> homePopUpCardParses){
+    public void LoadEventCards(int discount, String eventID, HomePopUpCardAdapter homePopUpCardAdapter, List<HomePopUpCardParse> homePopUpCardParses) {
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
         databaseReference = databaseReference.child("SPL").child("Events").child(eventID).child("Cards List");
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -123,7 +123,7 @@ public class CustomDialogHome extends Dialog implements View.OnClickListener {
                 homePopUpCardParses.clear();
                 Iterable<DataSnapshot> snapshotIterable = snapshot.getChildren();
                 int i = 0;
-                for (DataSnapshot next : snapshotIterable){
+                for (DataSnapshot next : snapshotIterable) {
                     String cardID = next.getKey();
                     String name = next.child("Name").getValue().toString();
                     String imageURL = next.child("Image URL").getValue().toString();
@@ -131,11 +131,11 @@ public class CustomDialogHome extends Dialog implements View.OnClickListener {
                     String availability = next.child("Availability").getValue().toString();
                     String maxCount = next.child("Max Count").getValue().toString();
                     String cartCount = "1";
-                    if (userDataSnapshot.child("Card Cart List").hasChild(cardID)){
+                    if (userDataSnapshot.child("Card Cart List").hasChild(cardID)) {
                         cartCount = userDataSnapshot.child("Card Cart List").child(cardID).child("Count").getValue().toString();
                     }
-                    if (Integer.parseInt(availability) > 0){
-                        homePopUpCardParses.add(new HomePopUpCardParse(cardID,imageURL,name,prize,String.valueOf(discount),availability,maxCount, cartCount,i));
+                    if (Integer.parseInt(availability) > 0) {
+                        homePopUpCardParses.add(new HomePopUpCardParse(cardID, imageURL, name, prize, String.valueOf(discount), availability, maxCount, cartCount, i));
                         i++;
                     }
                 }
@@ -153,18 +153,18 @@ public class CustomDialogHome extends Dialog implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.button8) {
-            try{
+            try {
                 Intent intent = new Intent();
-                intent.setComponent(new ComponentName(currentAppID,"MainActivity.class"));
+                intent.setComponent(new ComponentName(currentAppID, "MainActivity.class"));
                 activity.startActivity(intent);
                 dismiss();
                 activity.finish();
-            }catch (Exception e){
+            } catch (Exception e) {
                 Toast.makeText(activity, e.toString(), Toast.LENGTH_SHORT).show();
             }
         }
 
-        if (v.getId() == R.id.button4){
+        if (v.getId() == R.id.button4) {
             new AlertDialog.Builder(activity)
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .setTitle("!! Notice !!")

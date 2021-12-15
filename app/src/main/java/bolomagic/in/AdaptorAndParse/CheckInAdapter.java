@@ -17,18 +17,11 @@ import bolomagic.in.R;
 
 public class CheckInAdapter extends RecyclerView.Adapter<CheckInAdapter.MyViewHolder> {
     private final List<CheckInParse> checkInParseList;
-    class MyViewHolder extends RecyclerView.ViewHolder {
-        TextView day;
-        ImageView imageView;
-        MyViewHolder(View view) {
-            super(view);
-            day = view.findViewById(R.id.textView);
-            imageView = view.findViewById(R.id.imageView);
-        }
-    }
+
     public CheckInAdapter(List<CheckInParse> checkInParses) {
         this.checkInParseList = checkInParses;
     }
+
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -36,6 +29,7 @@ public class CheckInAdapter extends RecyclerView.Adapter<CheckInAdapter.MyViewHo
                 .inflate(R.layout.check_in_view, parent, false);
         return new MyViewHolder(itemView);
     }
+
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
         CheckInParse checkInParse = checkInParseList.get(position);
@@ -43,8 +37,20 @@ public class CheckInAdapter extends RecyclerView.Adapter<CheckInAdapter.MyViewHo
         holder.day.setText(checkInParse.getDay());
         Picasso.get().load(checkInParse.getImageURL()).into(holder.imageView);
     }
+
     @Override
     public int getItemCount() {
         return checkInParseList.size();
+    }
+
+    class MyViewHolder extends RecyclerView.ViewHolder {
+        TextView day;
+        ImageView imageView;
+
+        MyViewHolder(View view) {
+            super(view);
+            day = view.findViewById(R.id.textView);
+            imageView = view.findViewById(R.id.imageView);
+        }
     }
 }

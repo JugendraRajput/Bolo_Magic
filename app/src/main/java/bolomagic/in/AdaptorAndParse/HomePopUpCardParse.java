@@ -4,12 +4,12 @@ public class HomePopUpCardParse {
     private final String cardID;
     private final String imageURL;
     private final String name;
-    private String prize;
-    private String discount;
     private final String availability;
     private final String maxCount;
-    private String cartCount;
     private final int index;
+    private String prize;
+    private String discount;
+    private String cartCount;
 
     public HomePopUpCardParse(String cardID, String imageURL, String name, String prize, String discount, String availability, String maxCount, String cartCount, int index) {
         this.cardID = cardID;
@@ -21,18 +21,6 @@ public class HomePopUpCardParse {
         this.maxCount = maxCount;
         this.cartCount = cartCount;
         this.index = index;
-    }
-
-    public void setPrize(String prize) {
-        this.prize = prize;
-    }
-
-    public void setDiscount(String discount) {
-        this.discount = discount;
-    }
-
-    public void setCartCount(String cartCount) {
-        this.cartCount = cartCount;
     }
 
     public String getCardID() {
@@ -51,8 +39,16 @@ public class HomePopUpCardParse {
         return prize;
     }
 
+    public void setPrize(String prize) {
+        this.prize = prize;
+    }
+
     public String getDiscount() {
         return discount;
+    }
+
+    public void setDiscount(String discount) {
+        this.discount = discount;
     }
 
     public String getAvailability() {
@@ -65,6 +61,10 @@ public class HomePopUpCardParse {
 
     public String getCartCount() {
         return cartCount;
+    }
+
+    public void setCartCount(String cartCount) {
+        this.cartCount = cartCount;
     }
 
     public int getIndex() {

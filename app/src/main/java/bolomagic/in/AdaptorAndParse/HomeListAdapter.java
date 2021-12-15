@@ -23,7 +23,7 @@ public class HomeListAdapter extends ArrayAdapter<HomeListParse> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View listItemView = convertView;
-        if(listItemView == null) {
+        if (listItemView == null) {
             listItemView = LayoutInflater.from(getContext()).inflate(R.layout.home_list_view, parent, false);
         }
 

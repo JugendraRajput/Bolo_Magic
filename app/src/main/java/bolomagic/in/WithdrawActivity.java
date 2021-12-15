@@ -1,9 +1,5 @@
 package bolomagic.in;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -15,6 +11,10 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -29,14 +29,14 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Objects;
+import java.util.logging.Logger;
 
 import bolomagic.in.AdaptorAndParse.withdrawalMethodsAdapter;
 import bolomagic.in.AdaptorAndParse.withdrawalMethodsParse;
 
-import java.util.logging.Logger;
-
 public class WithdrawActivity extends AppCompatActivity {
 
+    private static final Logger log = Logger.getLogger(WithdrawActivity.class.getName());
     String withdrawType = "NULL";
     int walletAmount = 0;
     TextView balanceTextView, noticeTextView;
@@ -44,22 +44,16 @@ public class WithdrawActivity extends AppCompatActivity {
     FirebaseAuth mAuth;
     String UID;
     boolean isInstantWithdraw = false;
-
     ArrayList<withdrawalMethodsParse> withdrawalMethodsParseArrayList = new ArrayList<>();
     ListView listView;
-
     //Current Variables
     String withdrawMethod = "DEFAULT";
     String withdrawValue = "DEFAULT";
-    
     //For Getting Details
     TextView textView1;
     EditText editText1;
     Button button1;
-
     EditText amountEditText;
-
-    private static final Logger log = Logger.getLogger(WithdrawActivity.class.getName());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,17 +62,17 @@ public class WithdrawActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser mFirebaseUser = mAuth.getCurrentUser();
-        if(mFirebaseUser != null) {
+        if (mFirebaseUser != null) {
             UID = mFirebaseUser.getUid();
         }
 
         withdrawType = getIntent().getStringExtra("Withdraw Type");
         balanceTextView = findViewById(R.id.balanceTextView);
         noticeTextView = findViewById(R.id.noticeTextView);
-        balanceTextView.setText("Winnings Balance : "+R.string.loading);
+        balanceTextView.setText("Winnings Balance : " + R.string.loading);
         listView = findViewById(R.id.withdrawalMethodsListView);
         withdrawButton = findViewById(R.id.withdrawButton);
-        
+
         textView1 = findViewById(R.id.textView1);
         editText1 = findViewById(R.id.editText1);
         button1 = findViewById(R.id.button1);
@@ -104,34 +98,34 @@ public class WithdrawActivity extends AppCompatActivity {
         button1.setOnClickListener(v -> {
             String value = editText1.getText().toString();
             String hint = editText1.getHint().toString();
-            if (value.equals("")){
+            if (value.equals("")) {
                 editText1.setError(hint);
                 editText1.requestFocus();
-            }else {
-                if (hint.equals("Enter UPI ID")){
+            } else {
+                if (hint.equals("Enter UPI ID")) {
                     FirebaseDatabase.getInstance().getReference().child("SPL").child("Users").child(UID)
                             .child("Withdrawal Methods").child("upi").setValue(value).addOnCompleteListener(task -> {
-                                findViewById(R.id.entryLayout).setVisibility(View.GONE);
-                                findViewById(R.id.mainLayout).setVisibility(View.VISIBLE);
-                            });
+                        findViewById(R.id.entryLayout).setVisibility(View.GONE);
+                        findViewById(R.id.mainLayout).setVisibility(View.VISIBLE);
+                    });
                 }
-                if (hint.equals("Enter Paytm no.")){
+                if (hint.equals("Enter Paytm no.")) {
                     FirebaseDatabase.getInstance().getReference().child("SPL").child("Users").child(UID)
                             .child("Withdrawal Methods").child("paytmWallet").setValue(value).addOnCompleteListener(task -> {
-                                findViewById(R.id.entryLayout).setVisibility(View.GONE);
-                                findViewById(R.id.mainLayout).setVisibility(View.VISIBLE);
-                            });
+                        findViewById(R.id.entryLayout).setVisibility(View.GONE);
+                        findViewById(R.id.mainLayout).setVisibility(View.VISIBLE);
+                    });
                 }
             }
         });
 
         listView.setOnItemClickListener((parent, view, position, id) -> {
-            try{
-                for (int i=0;i<=withdrawalMethodsParseArrayList.size();i++){
-                    if(position==i){
+            try {
+                for (int i = 0; i <= withdrawalMethodsParseArrayList.size(); i++) {
+                    if (position == i) {
                         withdrawMethod = withdrawalMethodsParseArrayList.get(position).getMethodID();
                         withdrawValue = withdrawalMethodsParseArrayList.get(position).getMethodValue();
-                        if (withdrawMethod.equals("upi") && withdrawValue.equals("Setup UPI")){
+                        if (withdrawMethod.equals("upi") && withdrawValue.equals("Setup UPI")) {
                             //Setup UPI of user
                             textView1.setText("Please provide your UPI ID for transfering your amount to your bank account");
                             editText1.setHint("Enter UPI ID");
@@ -140,7 +134,7 @@ public class WithdrawActivity extends AppCompatActivity {
                             findViewById(R.id.entryLayout).setVisibility(View.VISIBLE);
                         }
 
-                        if (withdrawMethod.equals("paytmWallet") && withdrawValue.equals("Setup PayTm no. for wallet")){
+                        if (withdrawMethod.equals("paytmWallet") && withdrawValue.equals("Setup PayTm no. for wallet")) {
                             //Setup PayTm No. of user
                             textView1.setText("Please provide your Paytm no for transferring your amount to your paytm wallet");
                             editText1.setHint("Enter Paytm no.");
@@ -149,12 +143,11 @@ public class WithdrawActivity extends AppCompatActivity {
                             findViewById(R.id.entryLayout).setVisibility(View.VISIBLE);
                         }
                         listView.getChildAt(i).setBackgroundResource(R.drawable.selected_listview_bg);
-                    }else{
+                    } else {
                         listView.getChildAt(i).setBackgroundResource(R.drawable.unselected_listview_bg);
                     }
                 }
-            }
-            catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         });
@@ -164,51 +157,51 @@ public class WithdrawActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 withdrawalMethodsParseArrayList.clear();
-                if (Objects.requireNonNull(snapshot.child("Security Information").child("Account Status").getValue()).toString().equals("GOOD")){
+                if (Objects.requireNonNull(snapshot.child("Security Information").child("Account Status").getValue()).toString().equals("GOOD")) {
                     @SuppressLint("HardwareIds") String android_id = Settings.Secure.getString(WithdrawActivity.this.getContentResolver(), Settings.Secure.ANDROID_ID);
-                    if(snapshot.child("Security Information").child("Android ID").getValue().toString().equals(android_id)) {
-                        if (withdrawType.equals("Wallet")){
+                    if (snapshot.child("Security Information").child("Android ID").getValue().toString().equals(android_id)) {
+                        if (withdrawType.equals("Wallet")) {
                             walletAmount = Integer.parseInt(snapshot.child("Personal Information").child("Wallets").child("Wining Amount").getValue().toString());
                         }
-                        if (withdrawType.equals("Lifafa")){
+                        if (withdrawType.equals("Lifafa")) {
                             walletAmount = Integer.parseInt(snapshot.child("Personal Information").child("Lifafa").child("Wallet Amount").getValue().toString());
                         }
-                        balanceTextView.setText("Winnings Balance : ₹ "+walletAmount);
+                        balanceTextView.setText("Winnings Balance : ₹ " + walletAmount);
 
-                        if (walletAmount == 1){
+                        if (walletAmount == 1) {
                             noticeTextView.setText("Withdrawal amount ₹ 1");
                         }
-                        if (walletAmount < 1){
+                        if (walletAmount < 1) {
                             noticeTextView.setText("You have not sufficient withdrawal amount !");
                         }
-                        if (walletAmount > 1){
-                            noticeTextView.setText("Withdrawable amount ₹ 1 to ₹ "+walletAmount);
+                        if (walletAmount > 1) {
+                            noticeTextView.setText("Withdrawable amount ₹ 1 to ₹ " + walletAmount);
                         }
                         noticeTextView.setVisibility(View.VISIBLE);
 
-                        if (!snapshot.hasChild("Withdraw Requests")){
+                        if (!snapshot.hasChild("Withdraw Requests")) {
                             //For Now auto payments are not allowed. If this wil be launched in future then set isInstantWithdraw = true
                             isInstantWithdraw = false;
-                        }else {
+                        } else {
                             isInstantWithdraw = false;
                         }
-                        if (snapshot.child("Withdrawal Methods").hasChild("upi")){
+                        if (snapshot.child("Withdrawal Methods").hasChild("upi")) {
                             withdrawalMethodsParseArrayList.add(new withdrawalMethodsParse("upi",
                                     "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/UPI-Logo-vector.svg/1200px-UPI-Logo-vector.svg.png",
-                                    "UPI",snapshot.child("Withdrawal Methods").child("upi").getValue().toString()));
-                        }else {
+                                    "UPI", snapshot.child("Withdrawal Methods").child("upi").getValue().toString()));
+                        } else {
                             withdrawalMethodsParseArrayList.add(new withdrawalMethodsParse("upi",
                                     "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/UPI-Logo-vector.svg/1200px-UPI-Logo-vector.svg.png",
-                                    "UPI","Setup UPI"));
+                                    "UPI", "Setup UPI"));
                         }
-                        if (snapshot.child("Withdrawal Methods").hasChild("paytmWallet")){
+                        if (snapshot.child("Withdrawal Methods").hasChild("paytmWallet")) {
                             withdrawalMethodsParseArrayList.add(new withdrawalMethodsParse("paytmWallet",
                                     "https://cdn.iconscout.com/icon/free/png-512/paytm-226448.png",
-                                    "PayTm Wallet",snapshot.child("Withdrawal Methods").child("paytmWallet").getValue().toString()));
-                        }else {
+                                    "PayTm Wallet", snapshot.child("Withdrawal Methods").child("paytmWallet").getValue().toString()));
+                        } else {
                             withdrawalMethodsParseArrayList.add(new withdrawalMethodsParse("paytmWallet",
                                     "https://cdn.iconscout.com/icon/free/png-512/paytm-226448.png",
-                                    "PayTm Wallet","Setup PayTm no. for wallet"));
+                                    "PayTm Wallet", "Setup PayTm no. for wallet"));
                         }
 
                         withdrawalMethodsAdapter withdrawalMethodsAdapter = new withdrawalMethodsAdapter(WithdrawActivity.this, withdrawalMethodsParseArrayList);
@@ -223,7 +216,7 @@ public class WithdrawActivity extends AppCompatActivity {
                                 .setPositiveButton("OK", (dialogInterface, i) -> finish())
                                 .show();
                     }
-                }else {
+                } else {
                     databaseReference.keepSynced(false);
                     new AlertDialog.Builder(WithdrawActivity.this)
                             .setIcon(android.R.drawable.ic_dialog_alert)
@@ -246,36 +239,36 @@ public class WithdrawActivity extends AppCompatActivity {
         withdrawButton.setOnClickListener(v -> {
             noticeTextView.setVisibility(View.GONE);
             String editTextValue = amountEditText.getText().toString();
-            if (editTextValue.equals("")){
+            if (editTextValue.equals("")) {
                 noticeTextView.setText("Enter amount to withdraw !");
                 noticeTextView.setVisibility(View.VISIBLE);
-            }else {
-                if (withdrawMethod.equals("DEFAULT")){
+            } else {
+                if (withdrawMethod.equals("DEFAULT")) {
                     listView.requestFocus();
                     Toast.makeText(WithdrawActivity.this, "Please select withdraw method !", Toast.LENGTH_SHORT).show();
-                }else {
+                } else {
                     int withdrawAmount = Integer.parseInt(editTextValue);
-                    if (withdrawAmount == 0){
+                    if (withdrawAmount == 0) {
                         noticeTextView.setText("You are not able to withdraw ₹ 0");
                         noticeTextView.setVisibility(View.VISIBLE);
-                    }else {
-                        if (isInstantWithdraw){
-                            if (walletAmount >= 5){
-                                if (withdrawAmount <= 5){
+                    } else {
+                        if (isInstantWithdraw) {
+                            if (walletAmount >= 5) {
+                                if (withdrawAmount <= 5) {
                                     //Start first withdraw
                                     Toast.makeText(this, "InstantWithdraw not allowed right now !", Toast.LENGTH_SHORT).show();
-                                }else {
+                                } else {
                                     noticeTextView.setText("First withdraw can be ₹ 5 OR less !");
                                     noticeTextView.setVisibility(View.VISIBLE);
                                 }
-                            }else {
+                            } else {
                                 noticeTextView.setText("You have not sufficient balance to withdraw !");
                                 noticeTextView.setVisibility(View.VISIBLE);
                             }
-                        }else {
-                            if (withdrawAmount <= walletAmount){
+                        } else {
+                            if (withdrawAmount <= walletAmount) {
                                 withdrawHandler(withdrawAmount, amountEditText);
-                            }else {
+                            } else {
                                 noticeTextView.setText("You have not sufficient balance to withdraw !");
                                 noticeTextView.setVisibility(View.VISIBLE);
                             }
@@ -286,7 +279,7 @@ public class WithdrawActivity extends AppCompatActivity {
         });
     }
 
-    public void withdrawHandler(int withdrawAmount, EditText editText){
+    public void withdrawHandler(int withdrawAmount, EditText editText) {
         new AlertDialog.Builder(WithdrawActivity.this)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setTitle("!! Notice !!")
@@ -303,17 +296,17 @@ public class WithdrawActivity extends AppCompatActivity {
                     databaseReference.child(withdrawID).child("Withdraw Time").setValue(ServerValue.TIMESTAMP);
                     databaseReference.child(withdrawID).child("Status").setValue("Pending");
                     DatabaseReference userDatabaseReference = FirebaseDatabase.getInstance().getReference().child("SPL").child("Users").child(UID);
-                    if (withdrawType.equals("Wallet")){
-                        userDatabaseReference.child("Personal Information").child("Wallets").child("Wining Amount").setValue(walletAmount-withdrawAmount);
+                    if (withdrawType.equals("Wallet")) {
+                        userDatabaseReference.child("Personal Information").child("Wallets").child("Wining Amount").setValue(walletAmount - withdrawAmount);
                     }
-                    if (withdrawType.equals("Lifafa")){
-                        userDatabaseReference.child("Personal Information").child("Lifafa").child("Wallet Amount").setValue(walletAmount-withdrawAmount);
+                    if (withdrawType.equals("Lifafa")) {
+                        userDatabaseReference.child("Personal Information").child("Lifafa").child("Wallet Amount").setValue(walletAmount - withdrawAmount);
                     }
                     userDatabaseReference.child("Withdraw Requests").child(withdrawID).child("Withdraw Time").setValue(ServerValue.TIMESTAMP);
                     editText.setText("");
                     Toast.makeText(WithdrawActivity.this, "Request Successful...!", Toast.LENGTH_SHORT).show();
                 })
-                .setNegativeButton("Cancel",null)
+                .setNegativeButton("Cancel", null)
                 .show();
     }
 }

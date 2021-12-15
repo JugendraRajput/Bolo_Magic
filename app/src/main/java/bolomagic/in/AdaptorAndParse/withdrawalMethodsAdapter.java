@@ -23,7 +23,7 @@ public class withdrawalMethodsAdapter extends ArrayAdapter<withdrawalMethodsPars
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View listItemView = convertView;
-        if(listItemView == null) {
+        if (listItemView == null) {
             listItemView = LayoutInflater.from(getContext()).inflate(R.layout.withdrawal_methods_view, parent, false);
         }
 
@@ -41,7 +41,7 @@ public class withdrawalMethodsAdapter extends ArrayAdapter<withdrawalMethodsPars
         TextView textView2 = listItemView.findViewById(R.id.methodValueTextView);
         textView2.setText(withdrawalMethodsParse.getMethodValue());
 
-        if (withdrawalMethodsParse.getMethodValue().equals("DEFAULT")){
+        if (withdrawalMethodsParse.getMethodValue().equals("DEFAULT")) {
             textView2.setVisibility(View.GONE);
         }
 

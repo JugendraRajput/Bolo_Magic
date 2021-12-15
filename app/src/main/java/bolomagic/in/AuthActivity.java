@@ -37,13 +37,12 @@ import java.util.Random;
 
 public class AuthActivity extends AppCompatActivity {
 
+    //a constant for detecting the login intent result
+    private static final int RC_SIGN_IN = 234;
     ConstraintLayout checkingUpdatesLayout;
     Button loginButton;
     FirebaseAuth mAuth;
     String UID;
-
-    //a constant for detecting the login intent result
-    private static final int RC_SIGN_IN = 234;
     //creating a GoogleSignInClient object
     GoogleSignInClient mGoogleSignInClient;
 
@@ -130,12 +129,12 @@ public class AuthActivity extends AppCompatActivity {
                 });
     }
 
-    public void UserData(){
+    public void UserData() {
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser mFirebaseUser = mAuth.getCurrentUser();
-        if(mFirebaseUser != null) {
+        if (mFirebaseUser != null) {
             UID = mFirebaseUser.getUid();
-        }else {
+        } else {
             System.exit(0);
         }
         final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("SPL").child("Users").child(UID);
@@ -143,40 +142,36 @@ public class AuthActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 @SuppressLint("HardwareIds") String android_id = Settings.Secure.getString(AuthActivity.this.getContentResolver(), Settings.Secure.ANDROID_ID);
-                if (dataSnapshot.hasChild("Personal Information")){
-                    if(Objects.requireNonNull(dataSnapshot.child("Security Information").child("Account Status").getValue()).toString().equals("GOOD")) {
+                if (dataSnapshot.hasChild("Personal Information")) {
+                    if (Objects.requireNonNull(dataSnapshot.child("Security Information").child("Account Status").getValue()).toString().equals("GOOD")) {
                         databaseReference.child("Security Information").child("Android ID").setValue(android_id);
                         databaseReference.child("Personal Information").child("Application Status").setValue("Installed");
                         startActivity(new Intent(AuthActivity.this, MainActivity.class));
                     } else {
                         Toast.makeText(AuthActivity.this, "Your Account has been blocked by Admin :)", Toast.LENGTH_LONG).show();
                     }
-                }else {
+                } else {
                     Random r = new Random();
                     int d1 = r.nextInt(9);
                     int d2 = r.nextInt(9);
                     int d3 = r.nextInt(9);
                     int d4 = r.nextInt(9);
-                    while(d1==d2||d1==d3||d1==d4||d2==d3||d2==d4||d3==d4)
-                    {
-                        if(d1==d2||d2==d3||d2==d4)
-                        {
+                    while (d1 == d2 || d1 == d3 || d1 == d4 || d2 == d3 || d2 == d4 || d3 == d4) {
+                        if (d1 == d2 || d2 == d3 || d2 == d4) {
                             d2 = r.nextInt(9);
                         }
-                        if(d1==d3||d2==d3||d3==d4)
-                        {
+                        if (d1 == d3 || d2 == d3 || d3 == d4) {
                             d3 = r.nextInt(9);
                         }
-                        if(d1==d4||d2==d4||d3==d4)
-                        {
+                        if (d1 == d4 || d2 == d4 || d3 == d4) {
                             d4 = r.nextInt(9);
                         }
                     }
-                    String halfName = Objects.requireNonNull(Objects.requireNonNull(mAuth.getCurrentUser()).getDisplayName()).substring(0,2);
-                    String referCode = halfName.toUpperCase()+d1+d2+d3+d4;
+                    String halfName = Objects.requireNonNull(Objects.requireNonNull(mAuth.getCurrentUser()).getDisplayName()).substring(0, 2);
+                    String referCode = halfName.toUpperCase() + d1 + d2 + d3 + d4;
                     int tempInt = r.nextInt(9);
                     String d5 = String.valueOf(tempInt);
-                    referCode = referCode.replace(" ",d5);
+                    referCode = referCode.replace(" ", d5);
                     databaseReference.child("Personal Information").child("Name").setValue(mAuth.getCurrentUser().getDisplayName());
                     databaseReference.child("Personal Information").child("Email").setValue(mAuth.getCurrentUser().getEmail());
                     databaseReference.child("Personal Information").child("Profile Picture").setValue(Objects.requireNonNull(mAuth.getCurrentUser().getPhotoUrl()).toString());

@@ -1,10 +1,5 @@
 package bolomagic.in;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -18,6 +13,11 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -41,19 +41,18 @@ import bolomagic.in.CustomDialog.CustomDialogShare;
 
 public class ReferActivity extends AppCompatActivity {
 
+    public static String sharingMessage = "Bolo Magic - Play and Earn Money. Download now: https://bolomagic.in";
+    static int myTodayDay = 0;
+    static int friendTodayDay = 0;
+    static boolean doCheckIn = false;
+    static DataSnapshot userDataSnapshot;
     TextView myReferCodeTextVew, friendReferCodeTextView, referBottomMessageTextView;
     EditText referEditText;
     Button submitButton;
-    static int myTodayDay = 0;
-    static int friendTodayDay = 0;
-    public static String sharingMessage = "Bolo Magic - Play and Earn Money. Download now: https://bolomagic.in";
-    static boolean doCheckIn = false;
     String todayDateOnServer = "DEFAULT";
     String UID;
     ArrayList<ReferParse> referParses = new ArrayList<>();
     ProgressDialog progressDialog;
-
-    static DataSnapshot userDataSnapshot;
     boolean isSecurityChecked = false;
     boolean isDeviceRegistered = false;
 
@@ -87,13 +86,13 @@ public class ReferActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 progressDialog.dismiss();
                 userDataSnapshot = snapshot;
-                if (snapshot.child("Security Information").child("Account Status").getValue().toString().equals("GOOD")){
+                if (snapshot.child("Security Information").child("Account Status").getValue().toString().equals("GOOD")) {
                     String timeString = snapshot.child("Personal Information").child("Last Active").getValue().toString();
                     todayDateOnServer = getDate(Long.parseLong(timeString));
                     myReferCodeTextVew.setText(String.format("Refer Code: %s", snapshot.child("Personal Information").child("Refer Details").child("Refer Code").getValue()));
-                    if (!snapshot.child("Personal Information").child("Wallets").child("Refer Check In History").hasChild(todayDateOnServer)){
+                    if (!snapshot.child("Personal Information").child("Wallets").child("Refer Check In History").hasChild(todayDateOnServer)) {
                         doCheckIn = true;
-                    }else {
+                    } else {
                         doCheckIn = false;
                     }
                     if (snapshot.child("Personal Information").child("Wallets").hasChild("Refer Check In History")) {
@@ -110,18 +109,18 @@ public class ReferActivity extends AppCompatActivity {
                         friendReferCodeTextView.setVisibility(View.VISIBLE);
                         referEditText.setVisibility(View.GONE);
                         submitButton.setVisibility(View.GONE);
-                    }else {
+                    } else {
                         @SuppressLint("HardwareIds")
                         String android_id = Settings.Secure.getString(ReferActivity.this.getContentResolver(), Settings.Secure.ANDROID_ID);
                         FirebaseDatabase.getInstance().getReference().child("SPL").child("Referral Registered Devices").addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 isSecurityChecked = true;
-                                if (snapshot.hasChild(android_id)){
+                                if (snapshot.hasChild(android_id)) {
                                     isDeviceRegistered = true;
                                     friendReferCodeTextView.setText("Error: We have found duplicate account on same device.");
                                     friendReferCodeTextView.setVisibility(View.VISIBLE);
-                                    friendReferCodeTextView.setPadding(12,12,12,12);
+                                    friendReferCodeTextView.setPadding(12, 12, 12, 12);
                                     referEditText.setVisibility(View.GONE);
                                     submitButton.setVisibility(View.GONE);
                                 }
@@ -133,7 +132,7 @@ public class ReferActivity extends AppCompatActivity {
                             }
                         });
                     }
-                }else {
+                } else {
                     Toast.makeText(ReferActivity.this, "Your account has been blocked...!", Toast.LENGTH_SHORT).show();
                     finish();
                 }
@@ -152,7 +151,7 @@ public class ReferActivity extends AppCompatActivity {
         customDialogShare.show();
     }
 
-    public void AssignCheckIn(int i){
+    public void AssignCheckIn(int i) {
         RecyclerView recyclerView = findViewById(R.id.recycleView);
         List<CheckInParse> checkInParseList = new ArrayList<>();
         CheckInAdapter checkInAdapter = new CheckInAdapter(checkInParseList);
@@ -162,51 +161,51 @@ public class ReferActivity extends AppCompatActivity {
         recyclerView.setAdapter(checkInAdapter);
 
         checkInParseList.clear();
-        for (int j = 1; j<31; j++){
-            if (j<=i){
-                checkInParseList.add(new CheckInParse("https://res.cloudinary.com/dsznqkutd/image/upload/v1623817106/checked_wbucwx.png","Day "+j));
-            }else {
-                checkInParseList.add(new CheckInParse("https://res.cloudinary.com/dsznqkutd/image/upload/v1623817105/unchecked_ylmss3.png","Day "+j));
+        for (int j = 1; j < 31; j++) {
+            if (j <= i) {
+                checkInParseList.add(new CheckInParse("https://res.cloudinary.com/dsznqkutd/image/upload/v1623817106/checked_wbucwx.png", "Day " + j));
+            } else {
+                checkInParseList.add(new CheckInParse("https://res.cloudinary.com/dsznqkutd/image/upload/v1623817105/unchecked_ylmss3.png", "Day " + j));
             }
         }
         checkInAdapter.notifyDataSetChanged();
     }
 
-    public void OpenCheckInActivity(View view){
+    public void OpenCheckInActivity(View view) {
         if (doCheckIn) {
             startActivity(new Intent(ReferActivity.this, CheckInActivity.class));
-        }else {
+        } else {
             Toast.makeText(this, "Please check-In next day", Toast.LENGTH_SHORT).show();
         }
     }
 
-    public void ArrangeReferHistory(DataSnapshot dataSnapshot){
+    public void ArrangeReferHistory(DataSnapshot dataSnapshot) {
         referParses.clear();
-        if (dataSnapshot.child("Personal Information").child("Refer Details").hasChild("Refer Activity")){
+        if (dataSnapshot.child("Personal Information").child("Refer Details").hasChild("Refer Activity")) {
             Iterable<DataSnapshot> snapshotIterator = dataSnapshot.child("Personal Information").child("Refer Details").child("Refer Activity").child("Refer Users").getChildren();
             for (DataSnapshot next : snapshotIterator) {
                 String friendUID = next.getKey();
                 String friendName = next.child("Friend Name").getValue().toString();
                 String referDate = next.child("Time").getValue().toString();
                 referDate = getDate(Long.parseLong(referDate));
-                ReferParse referParse = new ReferParse("Date: "+referDate, friendName, friendUID);
+                ReferParse referParse = new ReferParse("Date: " + referDate, friendName, friendUID);
                 referParses.add(referParse);
             }
             ReferAdaptor referAdaptor = new ReferAdaptor(ReferActivity.this, R.layout.refer_layout_view, referParses);
             ListView referHistoryListView = findViewById(R.id.referHistoryListView);
             referHistoryListView.setAdapter(referAdaptor);
             findViewById(R.id.referHistoryLayout).setVisibility(View.VISIBLE);
-        }else {
+        } else {
             findViewById(R.id.referHistoryLayout).setVisibility(View.GONE);
         }
     }
 
-    public void Close(View view){
+    public void Close(View view) {
         findViewById(R.id.constraintLayout14).setVisibility(View.GONE);
         findViewById(R.id.imageView9).setVisibility(View.GONE);
     }
 
-    public String getDate(long time){
+    public String getDate(long time) {
         Date date = new Date(time);
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MMM-yyy");
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT+5:30"));
@@ -214,11 +213,11 @@ public class ReferActivity extends AppCompatActivity {
     }
 
     public void ApplyRefer() {
-        if (isSecurityChecked){
+        if (isSecurityChecked) {
             final String friendReferCode = referEditText.getText().toString();
             if (friendReferCode.equals("")) {
                 Toast.makeText(this, "Please enter friend Refer Code...!", Toast.LENGTH_SHORT).show();
-            }else {
+            } else {
                 final ProgressDialog referProgressDialog = new ProgressDialog(this);
                 referProgressDialog.setCancelable(false);
                 referProgressDialog.setCanceledOnTouchOutside(false);
@@ -232,8 +231,8 @@ public class ReferActivity extends AppCompatActivity {
                         Iterable<DataSnapshot> snapshotIterator = snapshot.getChildren();
                         boolean temp = true;
                         for (DataSnapshot next : snapshotIterator) {
-                            if (!next.getKey().equals(UID)){
-                                if (next.child("Personal Information").child("Refer Details").hasChild("Refer Code")){
+                            if (!next.getKey().equals(UID)) {
+                                if (next.child("Personal Information").child("Refer Details").hasChild("Refer Code")) {
                                     String friendReferCodeOnServer = next.child("Personal Information").child("Refer Details").child("Refer Code").getValue().toString();
                                     if (friendReferCodeOnServer.equals(friendReferCode)) {
 
@@ -273,7 +272,7 @@ public class ReferActivity extends AppCompatActivity {
                     }
                 });
             }
-        }else {
+        } else {
             Toast.makeText(this, "Security is running for your device.\nPlease wait...", Toast.LENGTH_SHORT).show();
         }
     }

@@ -21,13 +21,13 @@ import bolomagic.in.R;
 
 public class QuizListAdaptor extends ArrayAdapter<QuizListParse> {
 
-    public QuizListAdaptor(Context context, ArrayList<QuizListParse> quizListParseArrayList){
-        super(context,0,quizListParseArrayList);
+    public QuizListAdaptor(Context context, ArrayList<QuizListParse> quizListParseArrayList) {
+        super(context, 0, quizListParseArrayList);
     }
 
     @Override
-    public View getView(int position, View view, ViewGroup viewGroup){
-        if (view == null){
+    public View getView(int position, View view, ViewGroup viewGroup) {
+        if (view == null) {
             view = LayoutInflater.from(getContext()).inflate(R.layout.quiz_list_view, viewGroup, false);
         }
 
@@ -37,42 +37,42 @@ public class QuizListAdaptor extends ArrayAdapter<QuizListParse> {
         textView1.setText(quizListParse.getQuizName());
 
         TextView textView2 = view.findViewById(R.id.textView2);
-        textView2.setText("₹ "+quizListParse.getPrizePool());
+        textView2.setText("₹ " + quizListParse.getPrizePool());
 
         TextView textView3 = view.findViewById(R.id.textView3);
         String startTime = quizListParse.getQuizStartTime();
         String endTime = quizListParse.getQuizEndTime();
-        textView3.setText(startTime+" - "+endTime);
-        if (endTime.equals("Default")){
+        textView3.setText(startTime + " - " + endTime);
+        if (endTime.equals("Default")) {
             textView3.setText(startTime);
         }
 
         TextView textView4 = view.findViewById(R.id.textView4);
         int joined = Integer.parseInt(quizListParse.getTotalJoined());
         int maxJoined = Integer.parseInt(quizListParse.getMaxJoined());
-        textView4.setText(joined+"/"+maxJoined);
-        if (joined == maxJoined){
+        textView4.setText(joined + "/" + maxJoined);
+        if (joined == maxJoined) {
             textView4.setTextColor(Color.RED);
         }
 
         TextView textView5 = view.findViewById(R.id.textView5);
-        textView5.setText("Minimum: "+quizListParse.getMinimumJoin());
+        textView5.setText("Minimum: " + quizListParse.getMinimumJoin());
         textView5.setOnClickListener(v -> new AlertDialog.Builder(getContext())
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setTitle("!! Notice !!")
-                .setMessage("If minimum "+quizListParse.getMinimumJoin()+" player(s) don't register in this quiz then your quiz will be canceled and entry will be refunded.")
+                .setMessage("If minimum " + quizListParse.getMinimumJoin() + " player(s) don't register in this quiz then your quiz will be canceled and entry will be refunded.")
                 .show());
 
         Button button1 = view.findViewById(R.id.button1);
-        if (quizListParse.getIsJoined().equals("true")){
+        if (quizListParse.getIsJoined().equals("true")) {
             button1.setText("Joined");
             button1.setBackgroundResource(R.drawable.round_green_bg);
             button1.setOnClickListener(v -> {
                 String message = "Loading results...";
                 Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
             });
-        }else {
-            button1.setText("₹ "+quizListParse.getEntryFee());
+        } else {
+            button1.setText("₹ " + quizListParse.getEntryFee());
             button1.setOnClickListener(v -> {
                 String message = "Joining...";
                 Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
@@ -86,12 +86,12 @@ public class QuizListAdaptor extends ArrayAdapter<QuizListParse> {
     }
 
     @Override
-    public int getViewTypeCount(){
+    public int getViewTypeCount() {
         return getCount();
     }
 
     @Override
-    public int getItemViewType(int position){
+    public int getItemViewType(int position) {
         return position;
     }
 }

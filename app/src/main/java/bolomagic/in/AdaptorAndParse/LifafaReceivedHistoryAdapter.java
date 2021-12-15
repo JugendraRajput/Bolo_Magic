@@ -23,7 +23,7 @@ public class LifafaReceivedHistoryAdapter extends ArrayAdapter<LifafaReceivedHis
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View listItemView = convertView;
-        if(listItemView == null) {
+        if (listItemView == null) {
             listItemView = LayoutInflater.from(getContext()).inflate(R.layout.lifafa_received_history_view, parent, false);
         }
 
@@ -37,8 +37,8 @@ public class LifafaReceivedHistoryAdapter extends ArrayAdapter<LifafaReceivedHis
 
         TextView textView2 = listItemView.findViewById(R.id.textView2);
         String message = lifafaReceivedHistoryParse.getMessage();
-        if (message.length() > 29){
-            message = message.substring(0,29)+"...";
+        if (message.length() > 29) {
+            message = message.substring(0, 29) + "...";
         }
         textView2.setText(message);
 

@@ -1,11 +1,5 @@
 package bolomagic.in;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -14,6 +8,11 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -41,7 +40,7 @@ public class CartActivity extends AppCompatActivity {
     ArrayList<String> cartList = new ArrayList<>();
     double walletAmount = 0.0;
     double cartValue = 0.0;
-    TextView textView1,textView2;
+    TextView textView1, textView2;
     Button button;
 
     @Override
@@ -59,26 +58,26 @@ public class CartActivity extends AppCompatActivity {
         UID = mAuth.getCurrentUser().getUid();
 
         button.setOnClickListener(view -> {
-            if (cartValue > walletAmount){
+            if (cartValue > walletAmount) {
                 new AlertDialog.Builder(CartActivity.this)
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .setTitle("!! Low Balance !!")
                         .setMessage("You have not sufficient balance to place this order. Add Money to place this order.")
                         .setPositiveButton("Add Money", (dialogInterface, i) -> {
                             Intent intent = new Intent(CartActivity.this, PaymentActivity.class);
-                            intent.putExtra("Wallet Type","Wallet");
+                            intent.putExtra("Wallet Type", "Wallet");
                             startActivity(intent);
                         })
-                        .setNegativeButton("Cancel",null)
+                        .setNegativeButton("Cancel", null)
                         .setCancelable(true)
                         .show();
-            }else {
+            } else {
                 new AlertDialog.Builder(CartActivity.this)
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .setTitle("!! Notice !!")
                         .setMessage("Do you want to place this order?")
                         .setPositiveButton("Yes", (dialogInterface, i) -> placeOrder())
-                        .setNegativeButton("No",null)
+                        .setNegativeButton("No", null)
                         .setCancelable(true)
                         .show();
             }
@@ -89,16 +88,16 @@ public class CartActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 walletAmount = Double.parseDouble(snapshot.child("Wallets").child("Deposit Amount").getValue().toString());
-                textView2.setText("₹ "+walletAmount);
+                textView2.setText("₹ " + walletAmount);
                 cartList.clear();
-                if (snapshot.hasChild("Cart")){
+                if (snapshot.hasChild("Cart")) {
                     Iterable<DataSnapshot> snapshotIterator = snapshot.child("Cart").getChildren();
                     for (DataSnapshot next : snapshotIterator) {
                         cartList.add(next.getKey());
                     }
                     statusTextView.setText("Fetching Card Details...");
                     LoadCartProducts();
-                }else {
+                } else {
                     emptyLayout.setVisibility(View.VISIBLE);
                     cartListView.setVisibility(View.GONE);
                     ImageView imageView = findViewById(R.id.imageView10);
@@ -120,35 +119,35 @@ public class CartActivity extends AppCompatActivity {
         });
     }
 
-    public void LoadCartProducts(){
+    public void LoadCartProducts() {
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("SPL").child("Gift Cards");
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.hasChild("Products")){
+                if (snapshot.hasChild("Products")) {
                     Iterable<DataSnapshot> dataSnapshotIterable = snapshot.child("Products").getChildren();
                     cartParseArrayList.clear();
                     cartValue = 0.0;
                     for (DataSnapshot next : dataSnapshotIterable) {
-                        if (cartList.contains(next.getKey())){
+                        if (cartList.contains(next.getKey())) {
                             String cardID = next.getKey();
                             String imageURL = next.child("Image URL").getValue().toString();
                             String prize = next.child("Prize").getValue().toString();
                             String cashBack = next.child("CashBack %").getValue().toString();
-                            String effectivePrize = String.valueOf(Double.parseDouble(prize)-(Double.parseDouble(prize)*Double.parseDouble(cashBack))/100);
+                            String effectivePrize = String.valueOf(Double.parseDouble(prize) - (Double.parseDouble(prize) * Double.parseDouble(cashBack)) / 100);
                             SimpleDateFormat s1 = new SimpleDateFormat("dd");
                             SimpleDateFormat s2 = new SimpleDateFormat("MM-yyy");
                             String t1 = s1.format(new Date());
-                            int i = Integer.parseInt(t1)+7;
+                            int i = Integer.parseInt(t1) + 7;
                             String t2 = s2.format(new Date());
-                            String validity = i+"-"+t2;
+                            String validity = i + "-" + t2;
                             cartValue = cartValue + Double.parseDouble(effectivePrize);
-                            cartParseArrayList.add(new cartParse(cardID,imageURL,prize,cashBack,effectivePrize,validity));
+                            cartParseArrayList.add(new cartParse(cardID, imageURL, prize, cashBack, effectivePrize, validity));
                         }
                     }
                     cartAdapter cartAdapter = new cartAdapter(CartActivity.this, cartParseArrayList);
                     cartListView.setAdapter(cartAdapter);
-                    textView1.setText("₹ "+cartValue);
+                    textView1.setText("₹ " + cartValue);
                     button.setEnabled(true);
                     findViewById(R.id.amountsLayout).setVisibility(View.VISIBLE);
                     statusTextView.setText("Done");
@@ -156,7 +155,7 @@ public class CartActivity extends AppCompatActivity {
                     imageView.setImageResource(R.drawable.verified_img);
                     emptyLayout.setVisibility(View.GONE);
                     cartListView.setVisibility(View.VISIBLE);
-                }else {
+                } else {
                     emptyLayout.setVisibility(View.VISIBLE);
                     cartListView.setVisibility(View.GONE);
                     findViewById(R.id.amountsLayout).setVisibility(View.GONE);
@@ -165,6 +164,7 @@ public class CartActivity extends AppCompatActivity {
                     statusTextView.setText("Gift Cards are not available.");
                 }
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 ImageView imageView = findViewById(R.id.imageView10);

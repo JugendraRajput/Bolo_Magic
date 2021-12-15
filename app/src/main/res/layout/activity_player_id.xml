@@ -67,12 +67,12 @@
             android:background="@drawable/edittext_border"
             android:ems="10"
             android:hint="@string/enter_player_id"
+            android:importantForAutofill="no"
             android:inputType="text"
             android:padding="12dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView2"
-            android:importantForAutofill="no" />
+            app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
         <Button
             android:id="@+id/button1"

@@ -32,5 +32,8 @@
     <string name="or_send_lifafa_to_a_friend"><![CDATA[or Send Lifafa to a Friend >]]></string>
     <string name="beta">Beta</string>
     <string name="share">Share</string>
+    <string name="shop">Shop</string>
+    <string name="play">Play</string>
+    <string name="account">Account</string>
     <item name="item_click_support" type="id" />
 </resources>

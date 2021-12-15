@@ -1,16 +1,16 @@
 package bolomagic.in;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -43,7 +43,7 @@ public class CardListActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser mFirebaseUser = mAuth.getCurrentUser();
-        if(mFirebaseUser != null) {
+        if (mFirebaseUser != null) {
             UID = mFirebaseUser.getUid();
         }
         databaseReference = FirebaseDatabase.getInstance().getReference().child("SPL").child("Users").child(UID);
@@ -54,25 +54,25 @@ public class CardListActivity extends AppCompatActivity {
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.hasChild("Products")){
+                if (snapshot.hasChild("Products")) {
                     Iterable<DataSnapshot> dataSnapshotIterable = snapshot.child("Products").getChildren();
                     for (DataSnapshot next : dataSnapshotIterable) {
-                        if (next.child("Category").getValue().toString().equals(LocalCategory)){
+                        if (next.child("Category").getValue().toString().equals(LocalCategory)) {
                             String cardID = next.getKey();
                             String imageURL = next.child("Image URL").getValue().toString();
                             String prize = next.child("Prize").getValue().toString();
                             String cashBack = next.child("CashBack %").getValue().toString();
-                            String effectivePrize = String.valueOf(Double.parseDouble(prize)-(Double.parseDouble(prize)*Double.parseDouble(cashBack))/100);
+                            String effectivePrize = String.valueOf(Double.parseDouble(prize) - (Double.parseDouble(prize) * Double.parseDouble(cashBack)) / 100);
                             SimpleDateFormat s1 = new SimpleDateFormat("dd");
                             SimpleDateFormat s2 = new SimpleDateFormat("MM-yyy");
                             String t1 = s1.format(new Date());
-                            int i = Integer.parseInt(t1)+7;
+                            int i = Integer.parseInt(t1) + 7;
                             String t2 = s2.format(new Date());
-                            String validity = i+"-"+t2;
+                            String validity = i + "-" + t2;
                             String buttonText = "ADD";
-                            cardParses.add(new CardParse(cardID,imageURL,prize,cashBack,effectivePrize,validity,buttonText));
+                            cardParses.add(new CardParse(cardID, imageURL, prize, cashBack, effectivePrize, validity, buttonText));
                         }
-                      }
+                    }
                     CardsAdapter cardsAdapter = new CardsAdapter(CardListActivity.this, cardParses);
                     ListView listView = findViewById(R.id.listView);
                     listView.setAdapter(cardsAdapter);
@@ -87,7 +87,7 @@ public class CardListActivity extends AppCompatActivity {
     }
 
     public void Info(View view) {
-        String string = "How To Redeem"+"\n\t1. Download & Login into PayTm App." + "\n\t2. Go to Add Money.\n\t3. Goo to 'Have a PromoCode' and Enter the Code.\n\n" + "Where To Redeem"+"\n\tDownload & Login into PayTm App.\n\n" + "Terms"+"\n\t1. Download & Login into PayTm App.\n\t2. Go to Add Money." + "\n\t3. Go to 'Have a PromoCode' and Enter the Code.\n\t4. Valid for 7 from the date of issue of voucher.";
+        String string = "How To Redeem" + "\n\t1. Download & Login into PayTm App." + "\n\t2. Go to Add Money.\n\t3. Goo to 'Have a PromoCode' and Enter the Code.\n\n" + "Where To Redeem" + "\n\tDownload & Login into PayTm App.\n\n" + "Terms" + "\n\t1. Download & Login into PayTm App.\n\t2. Go to Add Money." + "\n\t3. Go to 'Have a PromoCode' and Enter the Code.\n\t4. Valid for 7 from the date of issue of voucher.";
         new AlertDialog.Builder(CardListActivity.this)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setMessage(string)
@@ -101,13 +101,13 @@ public class CardListActivity extends AppCompatActivity {
         String id = textView.getText().toString();
         Button button = (Button) constraintLayout.findViewById(R.id.cartButton);
         String buttonText = button.getText().toString();
-        if (buttonText.equals("ADD")){
+        if (buttonText.equals("ADD")) {
             button.setText("REMOVE");
             button.setBackgroundResource(R.drawable.red_background);
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyy-MM-dd hh:mm:ss");
             String time = simpleDateFormat.format(new Date());
             databaseReference.child("Personal Information").child("Cart").child(id).child("Time").setValue(time);
-        }else {
+        } else {
             button.setText("ADD");
             button.setBackgroundResource(R.drawable.blue_background);
             databaseReference.child("Personal Information").child("Cart").child(id).removeValue();

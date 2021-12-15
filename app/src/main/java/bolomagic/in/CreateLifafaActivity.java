@@ -1,12 +1,5 @@
 package bolomagic.in;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -21,6 +14,13 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -65,10 +65,10 @@ public class CreateLifafaActivity extends AppCompatActivity {
             if (actionBar != null) {
                 actionBar.setDisplayHomeAsUpEnabled(true);
                 actionBar.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                if (lifafaType.equals("GROUP")){
+                if (lifafaType.equals("GROUP")) {
                     setTitle("Create Lucky Lifafa");
                 }
-                if (lifafaType.equals("FRIEND")){
+                if (lifafaType.equals("FRIEND")) {
                     setTitle("Create Friend Lifafa");
                 }
             }
@@ -85,12 +85,12 @@ public class CreateLifafaActivity extends AppCompatActivity {
             recyclerView.setAdapter(lifafaThemeAdapter);
             ItemClickSupport.addTo(recyclerView)
                     .setOnItemClickListener((view, i, v) -> {
-                        if (i != lastSelected){
+                        if (i != lastSelected) {
                             fullImageURL = lifafaThemeParseArrayList.get(i).getFullImageURL();
                             shortImageURL = lifafaThemeParseArrayList.get(i).getShortImageURL();
                             lifafaThemeParseArrayList.get(i).setIsSelected("true");
                             lifafaThemeParseArrayList.get(lastSelected).setIsSelected("false");
-                            Picasso.get().load(fullImageURL).into((ImageView) findViewById(R.id.imageView));
+                            Picasso.get().load(fullImageURL).into((ImageView) findViewById(R.id.imageViewMain));
                             lifafaThemeAdapter.notifyDataSetChanged();
                             lastSelected = i;
                         }
@@ -102,19 +102,19 @@ public class CreateLifafaActivity extends AppCompatActivity {
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     Iterable<DataSnapshot> iterable = snapshot.getChildren();
                     int i = 0;
-                    for (DataSnapshot next : iterable){
+                    for (DataSnapshot next : iterable) {
                         String id = next.getKey();
                         String ShortImageURL = next.child("Short Image URL").getValue().toString();
                         String FullImageURL = next.child("Full Image URL").getValue().toString();
                         String title = next.child("Title").getValue().toString();
                         String isSelected = "false";
-                        if (i == 0){
+                        if (i == 0) {
                             isSelected = "true";
                             fullImageURL = FullImageURL;
                             shortImageURL = ShortImageURL;
-                            Picasso.get().load(fullImageURL).into((ImageView) findViewById(R.id.imageView));
+                            Picasso.get().load(fullImageURL).into((ImageView) findViewById(R.id.imageViewMain));
                         }
-                        lifafaThemeParseArrayList.add(new LifafaThemeParse(id,ShortImageURL,FullImageURL,title,isSelected));
+                        lifafaThemeParseArrayList.add(new LifafaThemeParse(id, ShortImageURL, FullImageURL, title, isSelected));
                         i++;
                     }
                     lifafaThemeAdapter.notifyDataSetChanged();
@@ -131,12 +131,12 @@ public class CreateLifafaActivity extends AppCompatActivity {
             EditText editText3 = findViewById(R.id.editText3);
             Button button = findViewById(R.id.button);
 
-            if (lifafaType.equals("FRIEND")){
+            if (lifafaType.equals("FRIEND")) {
                 editText1.setText("1");
                 editText1.setEnabled(false);
                 TextView textView = findViewById(R.id.textView);
                 textView.setText("This amount will be randomly distributed to your friend");
-            }else {
+            } else {
                 editText1.addTextChangedListener(new TextWatcher() {
                     @Override
                     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -148,14 +148,14 @@ public class CreateLifafaActivity extends AppCompatActivity {
                         int totalLifafa = 0;
                         try {
                             totalLifafa = Integer.parseInt(editText1.getText().toString());
-                            if (totalLifafa < 1){
+                            if (totalLifafa < 1) {
                                 editText1.setError("No. of Lifafa can't be less then 1");
                                 editText1.requestFocus();
-                            }else {
+                            } else {
                                 TextView textView = findViewById(R.id.textView);
-                                textView.setText("This amount will be randomly distributed between "+totalLifafa+" people");
+                                textView.setText("This amount will be randomly distributed between " + totalLifafa + " people");
                             }
-                        }catch (Exception e){
+                        } catch (Exception e) {
                             editText1.setError("Enter valid No. of Lifafa !");
                         }
                     }
@@ -175,44 +175,44 @@ public class CreateLifafaActivity extends AppCompatActivity {
                 String message = "Default";
                 try {
                     totalLifafa = Integer.parseInt(editText1.getText().toString());
-                    if (totalLifafa < 1){
+                    if (totalLifafa < 1) {
                         editText1.setError("No. of Lifafa can't be less then 1");
                         editText1.requestFocus();
-                    }else {
+                    } else {
                         b1 = true;
                     }
-                }catch (Exception e){
+                } catch (Exception e) {
                     editText1.setError("Enter valid No. of Lifafa !");
                     editText1.requestFocus();
                 }
                 try {
                     totalAmount = Integer.parseInt(editText2.getText().toString());
-                    if (totalAmount < totalLifafa){
-                        editText2.setError("Amount can't be less then "+totalLifafa);
+                    if (totalAmount < totalLifafa) {
+                        editText2.setError("Amount can't be less then " + totalLifafa);
                         editText2.requestFocus();
-                    }else {
+                    } else {
                         b2 = true;
                     }
-                }catch (Exception e){
+                } catch (Exception e) {
                     editText2.setError("Enter valid Amount !");
                     editText2.requestFocus();
                 }
-                if (b1 && b2){
+                if (b1 && b2) {
                     message = editText3.getText().toString();
-                    if (message.equals("")){
+                    if (message.equals("")) {
                         message = "Default";
                     }
-                    if (isAccountReady){
-                        if (totalAmount <= walletAmount){
+                    if (isAccountReady) {
+                        if (totalAmount <= walletAmount) {
                             editText1.setEnabled(false);
                             editText2.setEnabled(false);
                             editText3.setEnabled(false);
                             button.setEnabled(false);
-                            CreateLifafa(String.valueOf(totalLifafa),String.valueOf(totalAmount),message);
-                        }else {
+                            CreateLifafa(String.valueOf(totalLifafa), String.valueOf(totalAmount), message);
+                        } else {
                             ShowToast("You don't have sufficient balance !");
                         }
-                     }else {
+                    } else {
                         ShowToast("Something went wrong !");
                     }
                 }
@@ -224,7 +224,7 @@ public class CreateLifafaActivity extends AppCompatActivity {
                     try {
                         walletAmount = Double.parseDouble(snapshot.getValue().toString());
                         isAccountReady = true;
-                    }catch (Exception exception){
+                    } catch (Exception exception) {
                         isAccountReady = false;
                         ShowToast(exception.toString());
                     }
@@ -235,13 +235,13 @@ public class CreateLifafaActivity extends AppCompatActivity {
                     ShowToast(error.toString());
                 }
             });
-        }else {
+        } else {
             finish();
             startActivity(new Intent(CreateLifafaActivity.this, AuthActivity.class));
         }
     }
 
-    protected void CreateLifafa(String maxUsers, String maxAmount, String message){
+    protected void CreateLifafa(String maxUsers, String maxAmount, String message) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyMMddhhmmss");
         SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat("yyy");
         SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("MM");
@@ -252,7 +252,7 @@ public class CreateLifafaActivity extends AppCompatActivity {
         Random r = new Random();
         int O1 = r.nextInt(9);
         int O2 = r.nextInt(9);
-        String lifafaID = simpleDateFormat.format(new Date())+O1+O2;
+        String lifafaID = simpleDateFormat.format(new Date()) + O1 + O2;
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("SPL/Lifafa/");
         databaseReference.child(lifafaID).child("Sender ID").setValue(UID);
         databaseReference.child(lifafaID).child("Sender Name").setValue(mAuth.getCurrentUser().getDisplayName());
@@ -270,17 +270,17 @@ public class CreateLifafaActivity extends AppCompatActivity {
         databaseReference.child(lifafaID).child("Created On").child("mm").setValue(simpleDateFormat5.format(new Date()));
         databaseReference.child(lifafaID).child("Created On").child("ss").setValue(simpleDateFormat6.format(new Date()));
         DatabaseReference dR = FirebaseDatabase.getInstance().getReference("SPL/Users/").child(UID).child("Personal Information").child("Wallets").child("Deposit Amount");
-        dR.setValue(walletAmount-Double.parseDouble(maxAmount));
+        dR.setValue(walletAmount - Double.parseDouble(maxAmount));
         ShowToast("Lifafa has been created successfully.");
         createReferLink(lifafaID);
     }
 
-    public void createReferLink(String lifafaID){
+    public void createReferLink(String lifafaID) {
         DynamicLink dynamicLink = FirebaseDynamicLinks.getInstance().createDynamicLink()
-                .setLink(Uri.parse("https://www.bolomagic.in/lifafa/id="+lifafaID))
+                .setLink(Uri.parse("https://www.bolomagic.in/lifafa/id=" + lifafaID))
                 .setDynamicLinkDomain("bolomagic.page.link")
                 .setAndroidParameters(new DynamicLink.AndroidParameters.Builder().build())
-                .setIosParameters(new DynamicLink.IosParameters.Builder("https://www.bolomagic.in/lifafa/id="+lifafaID).build())
+                .setIosParameters(new DynamicLink.IosParameters.Builder("https://www.bolomagic.in/lifafa/id=" + lifafaID).build())
                 .buildDynamicLink();
         Uri dynamicLinkUri = dynamicLink.getUri();
         Task<ShortDynamicLink> shortLinkTask = FirebaseDynamicLinks.getInstance().createDynamicLink()
@@ -294,7 +294,7 @@ public class CreateLifafaActivity extends AppCompatActivity {
                         databaseReference.child(lifafaID).child("Link").setValue(shortLink.toString());
                         Intent intent = new Intent();
                         intent.setAction(Intent.ACTION_SEND);
-                        intent.putExtra(Intent.EXTRA_TEXT,  "I have created lucky lifafa on Bolo Magic. Claim it from "+shortLink.toString());
+                        intent.putExtra(Intent.EXTRA_TEXT, "I have created lucky lifafa on Bolo Magic. Claim it from " + shortLink.toString());
                         intent.setType("text/plain");
                         startActivity(intent);
                     } else {
@@ -303,7 +303,7 @@ public class CreateLifafaActivity extends AppCompatActivity {
                 });
     }
 
-    public void ShowToast(String errorMessage){
+    public void ShowToast(String errorMessage) {
         Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show();
     }
 

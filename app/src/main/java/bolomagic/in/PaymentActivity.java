@@ -1,9 +1,5 @@
 package bolomagic.in;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
@@ -17,6 +13,10 @@ import android.view.Window;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -34,13 +34,24 @@ import java.util.Objects;
 
 public class PaymentActivity extends AppCompatActivity {
 
-    EditText amountEt;
     final int UPI_PAYMENT = 0;
+    EditText amountEt;
     String UID = "";
     String myName = "";
     String myEmail = "";
     FirebaseAuth mAuth;
     String walletType = "DEFAULT";
+
+    public static boolean isConnectionAvailable(Context context) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager != null) {
+            NetworkInfo netInfo = connectivityManager.getActiveNetworkInfo();
+            return netInfo != null && netInfo.isConnected()
+                    && netInfo.isConnectedOrConnecting()
+                    && netInfo.isAvailable();
+        }
+        return false;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +65,7 @@ public class PaymentActivity extends AppCompatActivity {
         amountEt = findViewById(R.id.amountEditText);
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser mFirebaseUser = mAuth.getCurrentUser();
-        if(mFirebaseUser != null) {
+        if (mFirebaseUser != null) {
             UID = mFirebaseUser.getUid();
             myName = mAuth.getCurrentUser().getDisplayName();
             myEmail = mAuth.getCurrentUser().getEmail();
@@ -65,18 +76,18 @@ public class PaymentActivity extends AppCompatActivity {
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (Objects.requireNonNull(snapshot.child("Security Information").child("Account Status").getValue()).toString().equals("GOOD")){
+                if (Objects.requireNonNull(snapshot.child("Security Information").child("Account Status").getValue()).toString().equals("GOOD")) {
                     @SuppressLint("HardwareIds") String android_id = Settings.Secure.getString(PaymentActivity.this.getContentResolver(), Settings.Secure.ANDROID_ID);
-                    if(snapshot.child("Security Information").child("Android ID").getValue().toString().equals(android_id)) {
+                    if (snapshot.child("Security Information").child("Android ID").getValue().toString().equals(android_id)) {
                         int walletAmount = 0;
-                        if (walletType.equals("Wallet")){
+                        if (walletType.equals("Wallet")) {
                             walletAmount = Integer.parseInt(snapshot.child("Personal Information").child("Wallets").child("Wining Amount").getValue().toString());
                         }
-                        if (walletType.equals("Lifafa")){
+                        if (walletType.equals("Lifafa")) {
                             walletAmount = Integer.parseInt(snapshot.child("Personal Information").child("Lifafa").child("Wallet Amount").getValue().toString());
                         }
                         TextView textView = findViewById(R.id.textView19);
-                        textView.setText("Available Balance: "+walletAmount);
+                        textView.setText("Available Balance: " + walletAmount);
                     } else {
                         databaseReference.keepSynced(false);
                         new AlertDialog.Builder(PaymentActivity.this)
@@ -87,7 +98,7 @@ public class PaymentActivity extends AppCompatActivity {
                                 .setPositiveButton("OK", (dialogInterface, i) -> finish())
                                 .show();
                     }
-                }else {
+                } else {
                     databaseReference.keepSynced(false);
                     new AlertDialog.Builder(PaymentActivity.this)
                             .setIcon(android.R.drawable.ic_dialog_alert)
@@ -111,13 +122,13 @@ public class PaymentActivity extends AppCompatActivity {
         findViewById(R.id.button7).setOnClickListener(view -> {
             //Getting the values from the EditTexts
             String amount = amountEt.getText().toString();
-            if (!amount.equals("")){
+            if (!amount.equals("")) {
                 amountEt.setEnabled(false);
-                String note = "Add money to Bolo Magic of rs. "+amount+" by "+myName;
+                String note = "Add money to Bolo Magic of rs. " + amount + " by " + myName;
                 String name = myName;
                 String upiId = "8077233199@paytm";
                 payUsingUpi(amount, upiId, name, note);
-            }else {
+            } else {
                 amountEt.setError("Enter Amount !");
                 amountEt.requestFocus();
             }
@@ -125,15 +136,17 @@ public class PaymentActivity extends AppCompatActivity {
     }
 
     @SuppressLint("SetTextI18n")
-    public void Add50(View view){
+    public void Add50(View view) {
         amountEt.setText("50");
     }
+
     @SuppressLint("SetTextI18n")
-    public void Add100(View view){
+    public void Add100(View view) {
         amountEt.setText("100");
     }
+
     @SuppressLint("SetTextI18n")
-    public void Add200(View view){
+    public void Add200(View view) {
         amountEt.setText("200");
     }
 
@@ -156,11 +169,11 @@ public class PaymentActivity extends AppCompatActivity {
         Intent chooser = Intent.createChooser(upiPayIntent, "Pay with");
 
         // check if intent resolves
-        if(null != chooser.resolveActivity(getPackageManager())) {
+        if (null != chooser.resolveActivity(getPackageManager())) {
             startActivityForResult(chooser, UPI_PAYMENT);
         } else {
             amountEt.setEnabled(true);
-            Toast.makeText(PaymentActivity.this,"No UPI app found, please install one to continue",Toast.LENGTH_SHORT).show();
+            Toast.makeText(PaymentActivity.this, "No UPI app found, please install one to continue", Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -193,7 +206,7 @@ public class PaymentActivity extends AppCompatActivity {
         if (isConnectionAvailable(PaymentActivity.this)) {
             String str = data.get(0);
             String paymentCancel = "";
-            if(str == null) str = "discard";
+            if (str == null) str = "discard";
             String status = "";
             String[] response = str.split("&");
             for (String s : response) {
@@ -216,25 +229,25 @@ public class PaymentActivity extends AppCompatActivity {
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (walletType.equals("Wallet")) {
                             int walletAmount = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("Wallets").child("Deposit Amount").getValue()).toString());
-                            walletAmount = walletAmount+Integer.parseInt(amountEt.getText().toString());
+                            walletAmount = walletAmount + Integer.parseInt(amountEt.getText().toString());
                             databaseReference.child("Wallets").child("Deposit Amount").setValue(walletAmount);
                             @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("yyy-MM-dd hh:mm:ss");
                             String orderTime = dateFormat.format(new Date());
                             databaseReference.child("Wallets").child("Wallet History").child(orderTime).child("Name").setValue("Amount Added in Wallet.");
-                            databaseReference.child("Wallets").child("Wallet History").child(orderTime).child("Amount").setValue("+"+Integer.parseInt(amountEt.getText().toString()));
+                            databaseReference.child("Wallets").child("Wallet History").child(orderTime).child("Amount").setValue("+" + Integer.parseInt(amountEt.getText().toString()));
                             databaseReference.child("Wallets").child("Wallet History").child(orderTime).child("Time").setValue(ServerValue.TIMESTAMP);
                         }
-                        if (walletType.equals("Lifafa")){
+                        if (walletType.equals("Lifafa")) {
                             double walletAmount = 0.0;
-                            if (dataSnapshot.hasChild("Lifafa")){
+                            if (dataSnapshot.hasChild("Lifafa")) {
                                 walletAmount = Double.parseDouble(dataSnapshot.child("Lifafa").child("Wallet Amount").getValue().toString());
                             }
-                            walletAmount = walletAmount+Integer.parseInt(amountEt.getText().toString());
+                            walletAmount = walletAmount + Integer.parseInt(amountEt.getText().toString());
                             databaseReference.child("Lifafa").child("Wallet Amount").setValue(walletAmount);
                             @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("yyy-MM-dd hh:mm:ss");
                             String orderTime = dateFormat.format(new Date());
                             databaseReference.child("Lifafa").child("Wallet History").child(orderTime).child("Name").setValue("Amount Added in Lifafa Wallet.");
-                            databaseReference.child("Lifafa").child("Wallet History").child(orderTime).child("Amount").setValue("+"+Integer.parseInt(amountEt.getText().toString()));
+                            databaseReference.child("Lifafa").child("Wallet History").child(orderTime).child("Amount").setValue("+" + Integer.parseInt(amountEt.getText().toString()));
                             databaseReference.child("Lifafa").child("Wallet History").child(orderTime).child("Time").setValue(ServerValue.TIMESTAMP);
                         }
                         amountEt.setEnabled(true);
@@ -246,12 +259,10 @@ public class PaymentActivity extends AppCompatActivity {
                         Toast.makeText(PaymentActivity.this, databaseError.toString(), Toast.LENGTH_SHORT).show();
                     }
                 });
-            }
-            else if("Payment cancelled by user.".equals(paymentCancel)) {
+            } else if ("Payment cancelled by user.".equals(paymentCancel)) {
                 amountEt.setEnabled(true);
                 Toast.makeText(PaymentActivity.this, "Payment cancelled by user.", Toast.LENGTH_SHORT).show();
-            }
-            else {
+            } else {
                 amountEt.setEnabled(true);
                 Toast.makeText(PaymentActivity.this, "Transaction failed.Please try again", Toast.LENGTH_SHORT).show();
             }
@@ -259,16 +270,5 @@ public class PaymentActivity extends AppCompatActivity {
             amountEt.setEnabled(true);
             Toast.makeText(PaymentActivity.this, "Internet connection is not available. Please check and try again", Toast.LENGTH_SHORT).show();
         }
-    }
-
-    public static boolean isConnectionAvailable(Context context) {
-        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (connectivityManager != null) {
-            NetworkInfo netInfo = connectivityManager.getActiveNetworkInfo();
-            return netInfo != null && netInfo.isConnected()
-                    && netInfo.isConnectedOrConnecting()
-                    && netInfo.isAvailable();
-        }
-        return false;
     }
 }
