@@ -15,8 +15,9 @@
             android:orientation="horizontal">
 
             <View
-                android:layout_width="300dp"
-                android:layout_height="150dp"
+                android:layout_width="50dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
                 android:background="#D5D5D5" />
 
             <Space
@@ -24,8 +25,9 @@
                 android:layout_height="0dp" />
 
             <View
-                android:layout_width="300dp"
-                android:layout_height="150dp"
+                android:layout_width="50dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
                 android:background="#D5D5D5" />
 
         </LinearLayout>

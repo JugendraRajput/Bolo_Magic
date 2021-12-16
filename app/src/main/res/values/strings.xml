@@ -35,5 +35,6 @@
     <string name="shop">Shop</string>
     <string name="play">Play</string>
     <string name="account">Account</string>
+    <string name="make_payment">Make Payment</string>
     <item name="item_click_support" type="id" />
 </resources>
