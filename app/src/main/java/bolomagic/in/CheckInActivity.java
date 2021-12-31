@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.text.Html;
 import android.view.View;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -149,7 +151,15 @@ public class CheckInActivity extends AppCompatActivity {
         return false;
     }
 
-    @Override
+    static class webCont extends WebViewClient {
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            view.loadUrl(url);
+            return true;
+        }
+    }
+
+        @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_check_in);
@@ -158,6 +168,10 @@ public class CheckInActivity extends AppCompatActivity {
         UID = firebaseAuth.getCurrentUser().getUid();
 
         timerTextView = findViewById(R.id.textView14);
+
+        WebView webView = findViewById(R.id.webView);
+        webView.setWebViewClient(new webCont());
+        webView.loadUrl("https://www.instagram.com/gameskharidolite/" );
 
         if (ReferActivity.doCheckIn) {
             if (!(ReferActivity.myTodayDay > 30)) {

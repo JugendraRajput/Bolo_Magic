@@ -22,7 +22,7 @@
     <string name="exit">Finish</string>
     <string name="your_score">Your Score</string>
     <string name="please_enter_the_correct_player_id">Please enter the correct player id</string>
-    <string name="our_team_and_server_will_identify_you_by_this_id_you_can_save_player_id_once_in_the_one_event">Our team and server will identify you by this id. You can save player id once in the one event.</string>
+    <string name="our_team_and_server_will_identify_you_by_this_id_you_can_save_player_id_once_in_the_one_event">Our team and server will identify you by this id. You can save player id once in the one event/app/game.</string>
     <string name="player_id">Player ID</string>
     <string name="enter_player_id">Enter Player ID</string>
     <string name="save_id">Save ID</string>
@@ -36,5 +36,6 @@
     <string name="play">Play</string>
     <string name="account">Account</string>
     <string name="make_payment">Make Payment</string>
+    <string name="refer">Refer</string>
     <item name="item_click_support" type="id" />
 </resources>

@@ -33,6 +33,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
+import com.ismaeldivita.chipnavigation.ChipNavigationBar;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -72,7 +73,8 @@ public class MainActivity extends AppCompatActivity {
     String Name, Email, WiningAmount, BonusAmount, ProfilePicture;
     ShimmerFrameLayout homeShimmerViewContainer;
     ListView listView;
-    BottomNavigationView bottomNavigationView;
+
+    ChipNavigationBar chipNavigationBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,9 +116,9 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView FeaturedBannersRecyclerView = findViewById(R.id.recyclerView);
 
         List<FeaturedBannersParse> featuredBannersParses = new ArrayList<>();
-        featuredBannersParses.add(new FeaturedBannersParse("https://tuitionpad.com/wp-content/uploads/2020/08/refer11.png", "REFER"));
-        featuredBannersParses.add(new FeaturedBannersParse("https://akm-img-a-in.tosshub.com/indiatoday/envelope647_121717051808_2.jpg", "LIFAFA"));
-        featuredBannersParses.add(new FeaturedBannersParse("https://d2j6dbq0eux0bg.cloudfront.net/default-store/giftcards/gift_card_003_1500px.jpg", "Gift Card"));
+        featuredBannersParses.add(new FeaturedBannersParse("https://res.cloudinary.com/dsznqkutd/image/upload/v1640017641/refer_and_earn_y8m4bc.jpg", "REFER"));
+//        featuredBannersParses.add(new FeaturedBannersParse("https://akm-img-a-in.tosshub.com/indiatoday/envelope647_121717051808_2.jpg", "LIFAFA"));
+//        featuredBannersParses.add(new FeaturedBannersParse("https://d2j6dbq0eux0bg.cloudfront.net/default-store/giftcards/gift_card_003_1500px.jpg", "Gift Card"));
 
         FeaturedBannersAdapter featuredBannersAdapter = new FeaturedBannersAdapter(featuredBannersParses);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -204,25 +206,31 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void loadBottomNavigation() {
-        bottomNavigationView = findViewById(R.id.bottom_navigation);
-        bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
-            if (item.getItemId() == R.id.nav_home) {
-                setTitle("Shop");
-                ProfileScreen.animate().translationX(100).alpha(0).setDuration(100).withEndAction(() -> {
-                    ProfileScreen.setVisibility(View.GONE);
-                    HomeScreen.setVisibility(View.VISIBLE);
-                    HomeScreen.animate().translationX(0).alpha(1).setDuration(100);
-                });
+        chipNavigationBar = findViewById(R.id.chipNavigationBar);
+        chipNavigationBar.setItemSelected(R.id.nav_home, true);
+        chipNavigationBar.setOnItemSelectedListener(id -> {
+            switch (id) {
+                case R.id.nav_refer:
+                    startActivity(new Intent(MainActivity.this, ReferActivity.class));
+                    chipNavigationBar.setItemSelected(R.id.nav_home, true);
+                    break;
+                case R.id.nav_home:
+                    setTitle("Shop");
+                    ProfileScreen.animate().translationX(100).alpha(0).setDuration(100).withEndAction(() -> {
+                        ProfileScreen.setVisibility(View.GONE);
+                        HomeScreen.setVisibility(View.VISIBLE);
+                        HomeScreen.animate().translationX(0).alpha(1).setDuration(100);
+                    });
+                    break;
+                case R.id.nav_profile:
+                    setTitle("PLay");
+                    HomeScreen.animate().translationX(-100).alpha(0).setDuration(100).withEndAction(() -> {
+                        HomeScreen.setVisibility(View.GONE);
+                        ProfileScreen.setVisibility(View.VISIBLE);
+                        ProfileScreen.animate().translationX(0).alpha(1).setDuration(100);
+                    });
+                    break;
             }
-            if (item.getItemId() == R.id.nav_profile) {
-                setTitle("PLay");
-                HomeScreen.animate().translationX(-100).alpha(0).setDuration(100).withEndAction(() -> {
-                    HomeScreen.setVisibility(View.GONE);
-                    ProfileScreen.setVisibility(View.VISIBLE);
-                    ProfileScreen.animate().translationX(0).alpha(1).setDuration(100);
-                });
-            }
-            return true;
         });
     }
 
@@ -419,12 +427,12 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (bottomNavigationView.getSelectedItemId() == R.id.nav_profile) {
+        if (chipNavigationBar.getSelectedItemId() == R.id.nav_profile) {
             ProfileScreen.animate().translationX(100).alpha(0).setDuration(100).withEndAction(() -> {
                 ProfileScreen.setVisibility(View.GONE);
                 HomeScreen.setVisibility(View.VISIBLE);
                 HomeScreen.animate().translationX(0).alpha(1).setDuration(100);
-                bottomNavigationView.setSelectedItemId(R.id.nav_home);
+                chipNavigationBar.setItemSelected(R.id.nav_home, true);
             });
         } else {
             quizListParseArrayList.clear();

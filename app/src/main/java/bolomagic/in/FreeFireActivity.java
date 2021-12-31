@@ -6,6 +6,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Html;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -21,6 +22,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
@@ -50,6 +52,8 @@ public class FreeFireActivity extends AppCompatActivity {
     int selectedPosition = -1;
 
     String UID = "DEFAULT";
+    String PlayerID = "Default";
+    boolean isNewUser = true;
 
     @SuppressLint("ResourceType")
     @Override
@@ -74,7 +78,9 @@ public class FreeFireActivity extends AppCompatActivity {
         subtitleText.setText(subtitle);
 
         changeButton.setOnClickListener(v -> {
-            Toast.makeText(FreeFireActivity.this, "Please select another one", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(FreeFireActivity.this, PlayerID.class);
+            intent.putExtra("game_name",title);
+            startActivity(intent);
             finish();
         });
 
@@ -123,12 +129,11 @@ public class FreeFireActivity extends AppCompatActivity {
             Toast.makeText(FreeFireActivity.this, "Environment is not cool !", Toast.LENGTH_SHORT).show();
             finish();
         } else {
-            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("SPL").child("Application Details");
-            databaseReference.addValueEventListener(new ValueEventListener() {
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("SPL").child("Users").child(UID).child("Game Card History");
+            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    upiID = snapshot.child("UPI ID").getValue().toString();
-                    loadPrizeList(title);
+                    loadUPI(snapshot);
                 }
 
                 @Override
@@ -139,32 +144,73 @@ public class FreeFireActivity extends AppCompatActivity {
         }
     }
 
-    public void loadPrizeList(String gameName) {
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("SPL/Gift Cards/Game Cards/" + gameName);
-        databaseReference.addValueEventListener(new ValueEventListener() {
+    public void loadUPI(DataSnapshot xSnapshot){
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("SPL").child("Application Details");
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.hasChild("Status") && Objects.requireNonNull(snapshot.child("Status").getValue()).toString().equals("Active")) {
-                    String offerMsg = Objects.requireNonNull(snapshot.child("Offer Message").getValue()).toString();
-                    offerMessageText.setText(offerMsg);
-                    if (snapshot.hasChild("Cards")) {
-                        Iterable<DataSnapshot> iterable = snapshot.child("Cards").getChildren();
-                        for (DataSnapshot next : iterable) {
-                            String id = next.getKey();
-                            String offerPercent = Objects.requireNonNull(next.child("Offer Percent").getValue()).toString();
-                            String prize = Objects.requireNonNull(next.child("Prize").getValue()).toString();
-                            String quantity = Objects.requireNonNull(next.child("Quantity").getValue()).toString();
-                            String unitType = Objects.requireNonNull(next.child("Unit Type").getValue()).toString();
-                            String icon_url = Objects.requireNonNull(next.child("Icon URL").getValue()).toString();
-                            gameCardParseArrayList.add(new GameCardParse(id,offerPercent,prize,quantity,unitType,icon_url));
+                upiID = snapshot.child("UPI ID").getValue().toString();
+                loadPrizeList(title, xSnapshot);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(FreeFireActivity.this, error.toString(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void loadPrizeList(String gameName, DataSnapshot xSnapshot) {
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("SPL/Gift Cards/Game Cards/" + gameName);
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.child("Player ID").hasChild(UID)){
+                    PlayerID = Objects.requireNonNull(snapshot.child("Player ID").child(UID).child("Player ID").getValue()).toString();
+
+                    if (snapshot.child("Order History").hasChild(PlayerID)){
+                        isNewUser = false;
+                    }
+
+//                    if (xSnapshot.hasChildren()){
+//                        Iterable<DataSnapshot> iterable = xSnapshot.getChildren();
+//                        for (DataSnapshot next : iterable){
+//                            if (next.child("Player ID").getValue().toString().equals(PlayerID)){
+//                                isNewUser = false;
+//                            }
+//                        }
+//                    }
+                    if (snapshot.hasChild("Status") && Objects.requireNonNull(snapshot.child("Status").getValue()).toString().equals("Active")) {
+                        String offerMsg = Objects.requireNonNull(snapshot.child("Offer Message").getValue()).toString();
+                        String string = offerMsg+"<br>Your "+gameName+" ID : <font color='#e28743'>"+PlayerID+"</font>";
+                        offerMessageText.setText(Html.fromHtml(string));
+                        if (snapshot.hasChild("Cards")) {
+                            Iterable<DataSnapshot> iterable = snapshot.child("Cards").getChildren();
+                            for (DataSnapshot next : iterable) {
+                                String id = next.getKey();
+                                String offerPercent = "10";
+                                if (isNewUser){
+                                    offerPercent = Objects.requireNonNull(next.child("Offer Percent").getValue()).toString();
+                                }
+                                String prize = Objects.requireNonNull(next.child("Prize").getValue()).toString();
+                                String quantity = Objects.requireNonNull(next.child("Quantity").getValue()).toString();
+                                String unitType = Objects.requireNonNull(next.child("Unit Type").getValue()).toString();
+                                String icon_url = Objects.requireNonNull(next.child("Icon URL").getValue()).toString();
+                                gameCardParseArrayList.add(new GameCardParse(id,offerPercent,prize,quantity,unitType,icon_url));
+                            }
+                            gameCardAdapter.notifyDataSetChanged();
+                        } else {
+                            Toast.makeText(FreeFireActivity.this, "No Offer available !", Toast.LENGTH_SHORT).show();
+                            finish();
                         }
-                        gameCardAdapter.notifyDataSetChanged();
                     } else {
-                        Toast.makeText(FreeFireActivity.this, "No Offer available !", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(FreeFireActivity.this, "Offer has been ended !", Toast.LENGTH_SHORT).show();
                         finish();
                     }
-                } else {
-                    Toast.makeText(FreeFireActivity.this, "Offer has been ended !", Toast.LENGTH_SHORT).show();
+                }else {
+                    Intent intent = new Intent(FreeFireActivity.this, PlayerID.class);
+                    intent.putExtra("game_name",gameName);
+                    startActivity(intent);
                     finish();
                 }
             }
@@ -179,7 +225,7 @@ public class FreeFireActivity extends AppCompatActivity {
     protected void makePayment(){
         String name = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
         String amount = gameCardParseArrayList.get(selectedPosition).getPrize();
-        String note = "Payment for Game Card on Bolo Magic of rs. " + amount + "\nUID: " + UID+"\nName: "+name;
+        String note = "Payment for Game Card on Bolo Magic of Rs. " + amount + "\nUID: " + UID+"\nName: "+name;
         Uri uri = Uri.parse("upi://pay").buildUpon()
                 .appendQueryParameter("pa", upiID)
                 .appendQueryParameter("pn", name)
@@ -268,7 +314,7 @@ public class FreeFireActivity extends AppCompatActivity {
         String quantity = gameCardParseArrayList.get(selectedPosition).getQuantity();
         String offer = gameCardParseArrayList.get(selectedPosition).getOfferPercent();
         String bonus = String.valueOf((Integer.parseInt(quantity)*Integer.parseInt(offer))/100);
-        GameCardOrder gameCardOrder = new GameCardOrder(id, quantity, bonus, prize, "Pending", orderDate);
+        GameCardOrder gameCardOrder = new GameCardOrder(id, quantity, bonus, prize, "Pending", orderDate,PlayerID,title);
         Map<String, Object> orderValues = gameCardOrder.toMap();
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put(orderID, orderValues);
@@ -276,6 +322,7 @@ public class FreeFireActivity extends AppCompatActivity {
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Admin");
         databaseReference.child("Game Card History").updateChildren(childUpdates);
         databaseReference.child("Game Card History").child(orderID).child("UID").setValue(UID);
+        FirebaseDatabase.getInstance().getReference("SPL/Gift Cards/Game Cards/" + title + "/Order History/"+PlayerID+"/Date").setValue(ServerValue.TIMESTAMP);
         Toast.makeText(FreeFireActivity.this, "Order Placed", Toast.LENGTH_SHORT).show();
         finish();
     }

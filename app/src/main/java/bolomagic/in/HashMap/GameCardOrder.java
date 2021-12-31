@@ -11,14 +11,18 @@ public class GameCardOrder {
     public String prize;
     public String status;
     public String orderDate;
+    public String playerID;
+    public String gameName;
 
-    public GameCardOrder(String id, String quantity, String bonus, String prize, String status, String orderDate) {
+    public GameCardOrder(String id, String quantity, String bonus, String prize, String status, String orderDate, String playerID, String gameName) {
         this.id = id;
         this.quantity = quantity;
         this.bonus = bonus;
         this.prize = prize;
         this.status = status;
         this.orderDate = orderDate;
+        this.playerID = playerID;
+        this.gameName = gameName;
     }
 
     public Map<String, Object> toMap() {
@@ -29,6 +33,8 @@ public class GameCardOrder {
         result.put("Bonus", bonus);
         result.put("Status", status);
         result.put("Order Date", orderDate);
+        result.put("Player ID", playerID);
+        result.put("Game Name", gameName);
         return result;
     }
 }

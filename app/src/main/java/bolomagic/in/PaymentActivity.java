@@ -41,6 +41,9 @@ public class PaymentActivity extends AppCompatActivity {
     String myEmail = "";
     FirebaseAuth mAuth;
     String walletType = "DEFAULT";
+    String upi_id = "8077233199@paytm";
+
+    boolean isLoaded = false;
 
     public static boolean isConnectionAvailable(Context context) {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -71,6 +74,20 @@ public class PaymentActivity extends AppCompatActivity {
             myEmail = mAuth.getCurrentUser().getEmail();
         }
         walletType = getIntent().getStringExtra("Wallet Type");
+
+        DatabaseReference databaseReferenceAdmin = FirebaseDatabase.getInstance().getReference("SPL/Application Details/");
+        databaseReferenceAdmin.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                upi_id = snapshot.child("UPI ID").getValue().toString();
+                isLoaded = true;
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(PaymentActivity.this, "", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("SPL").child("Users").child(UID);
         databaseReference.addValueEventListener(new ValueEventListener() {
@@ -121,16 +138,20 @@ public class PaymentActivity extends AppCompatActivity {
         //For UPI Payment
         findViewById(R.id.button7).setOnClickListener(view -> {
             //Getting the values from the EditTexts
-            String amount = amountEt.getText().toString();
-            if (!amount.equals("")) {
-                amountEt.setEnabled(false);
-                String note = "Add money to Bolo Magic of rs. " + amount + " by " + myName;
-                String name = myName;
-                String upiId = "8077233199@paytm";
-                payUsingUpi(amount, upiId, name, note);
-            } else {
-                amountEt.setError("Enter Amount !");
-                amountEt.requestFocus();
+            if (isLoaded){
+                String amount = amountEt.getText().toString();
+                if (!amount.equals("")) {
+                    amountEt.setEnabled(false);
+                    String note = "Add money to Bolo Magic of rs. " + amount + " by " + myName;
+                    String name = myName;
+                    String upiId = upi_id;
+                    payUsingUpi(amount, upiId, name, note);
+                } else {
+                    amountEt.setError("Enter Amount !");
+                    amountEt.requestFocus();
+                }
+            }else {
+                Toast.makeText(PaymentActivity.this, "Please wait...", Toast.LENGTH_SHORT).show();
             }
         });
     }

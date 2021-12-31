@@ -60,10 +60,16 @@
 
         <Button
             android:id="@+id/changeButton"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_margin="16dp"
-            android:background="@drawable/ic_reload_24"
+            android:background="@drawable/alpha_blue_background_round"
+            android:fontFamily="sans-serif-black"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:text="Change ID"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
             tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
     </LinearLayout>
